@@ -1,0 +1,16 @@
+{
+  "name": "noway-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "python3 build.py && tailwindcss -c tailwind.config.js -i src/input.css -o dist/styles.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "tailwindcss": "^3.4.19"
+  }
+}

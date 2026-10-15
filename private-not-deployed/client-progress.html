@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Noway.net – My Project Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5efe3; color: #2c2418; -webkit-font-smoothing: antialiased; }
+        .retro-stripe { background: linear-gradient(90deg, #5e9b3a 0%, #f4b400 20%, #e65c1e 40%, #c13b1b 60%, #6a3e9b 80%, #3c6eb4 100%); height: 4px; width: 100%; }
+        .apple-button { background: #2c6e9e; color: white; font-weight: 600; padding: 10px 28px; border-radius: 40px; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .apple-button:hover { background: #1e4a6e; transform: scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .nav-link { font-size: 14px; font-weight: 500; color: #4a3b2c; padding: 8px 16px; border-radius: 40px; transition: all 0.2s ease; }
+        .nav-link:hover { background: rgba(193, 59, 27, 0.08); color: #c13b1b; }
+        .glass-card { background: rgba(255,253,247,0.95); backdrop-filter: blur(2px); border: 1px solid rgba(226,220,208,0.8); border-radius: 28px; transition: all 0.2s; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        .glass-card:hover { transform: translateY(-4px); border-color: #c13b1b; }
+        .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+        .status-badge { padding: 4px 14px; border-radius: 40px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .bg-pending { background: #fef3c7; color: #b45309; }
+        .bg-progress { background: #e0f2fe; color: #0369a1; }
+        .bg-done { background: #dcfce7; color: #15803d; }
+        .logo-img { height: 24px; width: auto; display: block; transition: transform 0.2s ease; }
+        .group:hover .logo-img { transform: scale(1.05); }
+        .nav-container { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+        .nav-links-center { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem; flex: 1; margin: 0 1rem; }
+        @media (max-width: 768px) {
+            .nav-container { flex-direction: column; align-items: stretch; gap: 1rem; }
+            .nav-links-center { order: 2; margin: 0; justify-content: center; gap: 0.5rem; }
+            .logo-wrapper { order: 1; justify-content: center; }
+            .apple-button { order: 3; align-self: center; }
+            .logo-img { height: 20px; }
+        }
+    </style>
+</head>
+<body>
+<script>if(!localStorage.getItem('noway_client_logged_in')) window.location.href='register.html';function logout(){localStorage.removeItem('noway_client_logged_in');localStorage.removeItem('noway_cart');window.location.href='register.html';}</script>
+<div class="retro-stripe"></div>
+
+<nav class="bg-white/90 backdrop-blur-md border-b border-[#e2dcd0] sticky top-0 z-50 shadow-sm">
+    <div class="container mx-auto px-4 py-3">
+        <div class="nav-container">
+            <a href="index.html" class="flex items-center gap-2 text-xl font-bold tracking-tight group logo-wrapper shrink-0">
+                <img src="C:\Users\seanm\OneDrive\Documents\usb drive\Noway Apperal\Version 2\NW Logo 3 Transp.png" alt="Noway.net Logo" class="logo-img">
+                <span class="text-gray-800">Noway.net</span>
+            </a>
+            <div class="nav-links-center">
+                <a href="booking.html" class="nav-link">Booking</a>
+                <a href="hosting.html" class="nav-link">Hosting</a>
+                <a href="maintenance.html" class="nav-link">Maintenance</a>
+                <a href="priority.html" class="nav-link">Priority</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="client-progress.html" class="nav-link">My Projects</a>
+            </div>
+            <div class="shrink-0">
+                <a id="authButton" href="register.html" class="apple-button text-sm py-1.5 px-5">Login / Sign up</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container mx-auto px-4 py-12 max-w-5xl">
+    <div class="text-center mb-10"><h1 class="text-4xl font-bold tracking-tight mb-2">Your Project Dashboard</h1><p class="text-[#5a4a34]">Track progress, payments, and meetings.</p></div>
+    <div id="projects-container" class="space-y-8"></div>
+</main>
+
+<footer class="bg-white/80 border-t border-[#e2dcd0] py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+        <div class="retro-stripe w-28 mx-auto mb-5 rounded-full"></div>
+        <p class="text-[#5a4a34] text-sm tracking-wide">© 2025 Noway.net — Retro Apple aesthetic. Precision crafted digital experiences.</p>
+        <div class="flex justify-center gap-6 mt-4 text-xs text-[#7a6a54]">
+            <a href="#" class="hover:text-[#c13b1b] transition">Privacy</a>
+            <a href="#" class="hover:text-[#c13b1b] transition">Terms</a>
+            <a href="contact.html" class="hover:text-[#c13b1b] transition">Support</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+const loggedUser = JSON.parse(localStorage.getItem('noway_client_logged_in'));
+const USERS_KEY = 'noway_customers', STORAGE_KEY = 'dealpilot_clean_slate_v1';
+function getUsers(){return JSON.parse(localStorage.getItem(USERS_KEY)||'{}');}
+function loadState(){return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"projects":{},"financeData":{"transactions":[]}}');}
+function formatCurrency(amt){return new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR',minimumFractionDigits:0}).format(amt);}
+function getProjectPayment(p){if(p.paymentMode==='monthly') return p.monthlyPayment||0; if(p.paymentMode==='mixed') return (p.payment||0)+(p.monthlyPayment||0); return p.payment||0;}
+function getNextMeeting(meetings){if(!meetings?.length) return null; const today=new Date().toISOString().split('T')[0]; const upcoming=meetings.filter(m=>m.date>=today).sort((a,b)=>a.date.localeCompare(b.date)); return upcoming[0]||null;}
+function render(){
+    const users=getUsers(), current=users[loggedUser.email];
+    if(!current?.projects?.length){document.getElementById('projects-container').innerHTML=`<div class="glass-card p-12 text-center"><div class="text-5xl mb-3">📋</div><h2 class="text-2xl font-semibold mb-2">No projects yet</h2><p class="mb-6">Request a quote to get started.</p><a href="booking.html" class="apple-button">Start your first project →</a></div>`; return;}
+    const state=loadState();
+    const projectsData=current.projects.map(p=>({...p,data:state.projects[p.name]})).filter(p=>p.data);
+    let html='';
+    for(const proj of projectsData){
+        const p=proj.data, total=getProjectPayment(p), paid=p.amountPaid||0, outstanding=total-paid, percent=Math.min(100,Math.round(p.progress||0));
+        const next=getNextMeeting(p.meetings||[]);
+        const statusLabel=p.interest==='interested'?'Active':(p.emailReplied?'In Discussion':'Pending');
+        const statusClass=p.interest==='interested'?'bg-done':(p.emailReplied?'bg-progress':'bg-pending');
+        html+=`<div class="glass-card p-6 md:p-8"><div class="flex flex-col md:flex-row justify-between gap-4 mb-6"><div><h2 class="text-2xl font-bold">${escapeHtml(proj.name)}</h2><div class="flex gap-2 mt-1"><span class="status-badge ${statusClass}">${statusLabel}</span><span class="text-sm text-[#5a4a34]">#${proj.name.slice(-4)}</span></div></div><div class="text-right"><div class="text-3xl font-black text-[#2c6e9e]">${percent}%</div><div class="text-xs uppercase">Progress</div></div></div><div class="mb-8"><div class="flex justify-between text-sm mb-1"><span>Completion</span><span>${percent}%</span></div><div class="h-3 bg-[#e2dcd0] rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#2c6e9e] to-[#c13b1b] rounded-full transition-all duration-500" style="width:${percent}%"></div></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6"><div class="bg-[#f5efe3] rounded-2xl p-4 text-center"><div class="text-sm text-[#5a4a34]">Total Value</div><div class="stat-value text-[#2c6e9e]">${formatCurrency(total)}</div><div class="text-xs">${p.paymentMode==='monthly'?'Monthly':p.paymentMode==='mixed'?'Mixed':'One-time'}</div></div><div class="bg-[#f5efe3] rounded-2xl p-4 text-center"><div class="text-sm text-[#5a4a34]">Amount Paid</div><div class="stat-value text-green-700">${formatCurrency(paid)}</div></div><div class="bg-[#f5efe3] rounded-2xl p-4 text-center"><div class="text-sm text-[#5a4a34]">Outstanding</div><div class="stat-value ${outstanding>0?'text-[#c13b1b]':'text-green-700'}">${formatCurrency(outstanding)}</div></div></div><div class="border-t border-[#e2dcd0] pt-4 flex flex-wrap justify-between items-center gap-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-[#e2dcd0] flex items-center justify-center text-xl">📅</div><div><div class="text-sm font-medium">Next Meeting</div>${next?`<div class="font-semibold">${escapeHtml(next.title||'Meeting')}</div><div class="text-sm text-[#2c6e9e]">${next.date} at ${next.time||'TBD'}</div>${next.notes?`<div class="text-xs text-[#5a4a34]">${escapeHtml(next.notes)}</div>`:''}`:'<div class="text-sm text-[#5a4a34]">None scheduled</div>'}</div></div><a href="contact.html" class="text-sm text-[#c13b1b] underline">Contact us →</a></div></div>`;}
+    document.getElementById('projects-container').innerHTML=html;
+}
+function escapeHtml(s){if(!s)return '';return s.replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;});}
+render(); setInterval(render,10000); window.addEventListener('storage',render);
+
+const authButton = document.getElementById('authButton');
+const isLoggedIn = localStorage.getItem('noway_client_logged_in');
+if (isLoggedIn) {
+    authButton.textContent = 'Logout';
+    authButton.href = '#';
+    authButton.onclick = function(e) { e.preventDefault(); logout(); };
+} else {
+    authButton.textContent = 'Login / Sign up';
+    authButton.href = 'register.html';
+}
+</script>
+</body>
+</html>

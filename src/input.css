@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('fonts/inter-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; font-display: swap; src: url('fonts/inter-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('fonts/inter-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; font-display: swap; src: url('fonts/inter-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-weight: 800; font-display: swap; src: url('fonts/inter-latin-800-normal.woff2') format('woff2'); }
+  body { @apply font-sans bg-cream text-ink antialiased; }
+  :focus-visible { @apply outline-none ring-2 ring-offset-2 ring-rust; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; transform: none !important; } }
+}
+
+@layer components {
+  .retro-stripe { height: 4px; width: 100%; background: linear-gradient(90deg, #5e9b3a 0%, #f4b400 20%, #e65c1e 40%, #c13b1b 60%, #6a3e9b 80%, #3c6eb4 100%); }
+  .nav-link { @apply text-sm font-medium text-[#4a3b2c] px-3 py-2 rounded-full transition-colors whitespace-nowrap hover:bg-rust/10 hover:text-rust; }
+  .nav-link[aria-current="page"] { @apply text-rust font-semibold; }
+  .btn { @apply inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 px-7 rounded-full transition-all cursor-pointer text-center hover:shadow-lg; }
+  .btn:disabled { @apply opacity-60 cursor-not-allowed; }
+  .btn-outline { @apply inline-flex items-center justify-center gap-2 border-2 border-brand text-brand hover:bg-brand hover:text-white font-semibold py-2 px-6 rounded-full transition-colors text-center; }
+  .retro-card { @apply bg-paper border border-line rounded-[28px] flex flex-col h-full transition-all duration-200 hover:border-rust hover:-translate-y-1 hover:shadow-xl; }
+  .retro-card.static { @apply hover:translate-y-0 hover:shadow-none hover:border-line; }
+  .retro-card.off { @apply opacity-60; }
+  .form-input { @apply w-full px-4 py-3 border border-[#b9ae9a] rounded-3xl bg-white text-ink placeholder-muted; }
+  .prose-legal h2 { @apply text-2xl font-semibold text-ink mt-10 mb-3; }
+  .prose-legal p, .prose-legal li { @apply text-brown leading-relaxed mb-3; }
+  .prose-legal ul { @apply list-disc pl-6 mb-3; }
+  .prose-legal a, .link { @apply text-rust underline; }
+  .faq-item summary { @apply cursor-pointer p-4 font-semibold list-none flex justify-between items-center gap-4; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; @apply text-rust text-2xl leading-none; }
+  .faq-item[open] summary::after { content: '\2212'; }
+  .faq-item[open] summary { @apply border-b border-line; }
+  .faq-item[open] { @apply border-rust; }
+}

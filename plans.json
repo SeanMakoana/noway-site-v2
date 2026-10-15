@@ -1,0 +1,16 @@
+{
+  "depositRate": 0.5,
+  "plans": {
+    "bronze": {"slot": "package", "group": "Website project", "name": "Bronze Website Package", "short": "Bronze", "price": 3500, "type": "deposit", "blurb": "1-2 page custom website"},
+    "silver": {"slot": "package", "group": "Website project", "name": "Silver Website Package", "short": "Silver", "price": 6500, "type": "deposit", "blurb": "Up to 5 page custom website"},
+    "gold": {"slot": "package", "group": "Website project", "name": "Gold Website Package", "short": "Gold", "price": 9500, "type": "deposit", "blurb": "Unlimited pages, e-commerce and CMS"},
+    "priority-bronze": {"slot": "priority", "group": "Priority add-on", "name": "Bronze Priority", "short": "Bronze", "price": 2000, "type": "once", "blurb": "Priority add-on for a Bronze project"},
+    "priority-silver": {"slot": "priority", "group": "Priority add-on", "name": "Silver Priority", "short": "Silver", "price": 1500, "type": "once", "blurb": "Priority add-on for a Silver project"},
+    "priority-gold": {"slot": "priority", "group": "Priority add-on", "name": "Gold Priority", "short": "Gold", "price": 1000, "type": "once", "blurb": "Priority add-on for a Gold project"},
+    "hosting-basic": {"slot": "hosting", "group": "Hosting", "name": "Basic Hosting", "short": "Basic", "price": 150, "type": "monthly", "blurb": "Monthly hosting"},
+    "hosting-pro": {"slot": "hosting", "group": "Hosting", "name": "Pro Hosting", "short": "Pro", "price": 300, "type": "monthly", "blurb": "Monthly hosting"},
+    "hosting-enterprise": {"slot": "hosting", "group": "Hosting", "name": "Enterprise Hosting", "short": "Enterprise", "price": 750, "type": "monthly", "blurb": "Monthly hosting"},
+    "maintenance-monthly": {"slot": "maintenance", "group": "Maintenance", "name": "Monthly Maintenance", "short": "Monthly", "price": 500, "type": "monthly", "blurb": "Monthly maintenance"},
+    "maintenance-weekly": {"slot": "maintenance", "group": "Maintenance", "name": "Weekly Maintenance", "short": "Weekly", "price": 1200, "type": "monthly", "blurb": "Weekly maintenance, billed monthly"}
+  }
+}

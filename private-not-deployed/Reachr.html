@@ -1,0 +1,4033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reachr.</title>
+<link rel="icon" type="image/png" href="C:\Users\seanm\OneDrive\Documents\DealPilot\favicon3.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ── DARK THEME (Retro Hi-Fi) — default ── */
+  :root {
+    --bg: #080808;
+    --surface: #111110;
+    --surface2: #191816;
+    --border: #2a2720;
+    --accent: #e8d5a0;
+    --accent2: #c8a060;
+    --text: #f0e8d8;
+    --text-dim: #7a7060;
+    --text-muted: #3a3428;
+    --green: #4aaa44;
+    --red: #dd3322;
+    --blue: #4488cc;
+    --pending: #d4880a;
+    --radius: 10px;
+    --sidebar-w: 200px;
+    --taskbar-bg: rgba(8,8,8,0.98);
+    /* Diagonal stripe colours — blue, yellow, orange, red */
+    --s1: #5599cc;
+    --s2: #e8c030;
+    --s3: #e07820;
+    --s4: #cc3322;
+  }
+
+  /* ── LIGHT THEME (Retro Apple Rainbow) ── */
+  [data-theme="light"] {
+    --bg: #f3eddc;
+    --surface: #fbf6e8;
+    --surface2: #efe5cb;
+    --border: #cdbf96;
+    --accent: #e85112;
+    --accent2: #d44800;
+    --text: #1a1208;
+    --text-dim: #5a4830;
+    --text-muted: #9a8870;
+    --green: #2a8a1a;
+    --red: #cc2200;
+    --blue: #1a44cc;
+    --pending: #cc7700;
+    --radius: 10px;
+    --sidebar-w: 200px;
+    --taskbar-bg: rgba(245,240,232,0.97);
+    --grid-line: transparent;
+    --chrome-glow: none;
+    /* Rainbow stripe accent colors */
+    --r1: #61bb46;
+    --r2: #fdb827;
+    --r3: #f5821f;
+    --r4: #e03a3e;
+    --r5: #963d97;
+    --r6: #009ddc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ── DARK THEME OVERRIDES (Retro Hi-Fi) ── */
+
+  /* Diagonal stripe bar on taskbar bottom */
+  body:not([data-theme="light"]) #taskbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--s1) 0%, var(--s1) 25%, var(--s2) 25%, var(--s2) 50%, var(--s3) 50%, var(--s3) 75%, var(--s4) 75%);
+  }
+
+  /* Diagonal stripe sidebar accent — mimics the wedge shape */
+  body:not([data-theme="light"]) #sidebar {
+    position: relative;
+    background: var(--surface);
+  }
+  body:not([data-theme="light"]) #sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--s1) 0%, var(--s2) 33%, var(--s3) 66%, var(--s4) 100%);
+  }
+
+  /* Diagonal stripe wedge on overview cards — like the logo mark */
+  body:not([data-theme="light"]) .area-replied  { border-left: 4px solid var(--s1); }
+  body:not([data-theme="light"]) .area-interest { border-left: 4px solid var(--s2); }
+  body:not([data-theme="light"]) .area-brief    { border-left: 4px solid var(--s3); }
+  body:not([data-theme="light"]) .area-calendar { border-left: 4px solid var(--s4); }
+  body:not([data-theme="light"]) .area-todo     { border-left: 4px solid var(--s1); }
+
+  /* Active tab — cream text, warm underline */
+  body:not([data-theme="light"]) .tab-btn.active {
+    color: var(--accent);
+    border-color: rgba(232,213,160,0.25);
+    background: rgba(232,213,160,0.05);
+    letter-spacing: 0.04em;
+  }
+
+  /* Active project */
+  body:not([data-theme="light"]) .project-btn.active {
+    color: var(--accent);
+    border-color: rgba(232,213,160,0.25);
+    background: rgba(232,213,160,0.05);
+  }
+
+  /* Buttons — cream background, dark text */
+  body:not([data-theme="light"]) .form-btn {
+    background: var(--accent);
+    color: #080808;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  body:not([data-theme="light"]) .todo-input-btn {
+    background: var(--accent);
+    color: #080808;
+  }
+
+  /* Progress bar — diagonal stripe */
+  body:not([data-theme="light"]) .progress-bar-fill {
+    background: linear-gradient(90deg, var(--s1), var(--s2), var(--s3), var(--s4));
+  }
+
+  /* Today highlight — red like the bottom stripe */
+  body:not([data-theme="light"]) .cal-day.today {
+    background: var(--s4);
+    color: #f0e8d8;
+    font-weight: 800;
+  }
+
+  /* Tab logo — big cream serif feel */
+  body:not([data-theme="light"]) .tab-logo {
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    font-size: 14px;
+  }
+
+  /* Cards — very subtle warm border */
+  body:not([data-theme="light"]) .card {
+    border-color: #252218;
+  }
+  body:not([data-theme="light"]) .card:hover {
+    border-color: rgba(232,213,160,0.2);
+  }
+
+  /* Stat cards in finance — stripe left borders */
+  body:not([data-theme="light"]) #fin-stat-balance { border-left: 4px solid var(--s1); }
+  body:not([data-theme="light"]) #fin-stat-income  { border-left: 4px solid var(--s2); }
+  body:not([data-theme="light"]) #fin-stat-expense { border-left: 4px solid var(--s3); }
+  body:not([data-theme="light"]) #fin-stat-outstanding { border-left: 4px solid var(--s4); }
+
+  /* ── TOP TASKBAR (auto-hide) ── */
+  #taskbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    background: var(--taskbar-bg);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 4px;
+    z-index: 100;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+  }
+  #taskbar.hidden { transform: translateY(-100%); }
+  #taskbar-trigger {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 6px; z-index: 99;
+  }
+
+  .tab-btn {
+    padding: 6px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--surface2); }
+  .tab-btn.active {
+    background: var(--surface2);
+    border-color: var(--border);
+    color: var(--accent);
+  }
+  .tab-logo {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--accent);
+    margin-right: 12px;
+    letter-spacing: -0.03em;
+  }
+  .tab-spacer { flex: 1; }
+  .tab-clock {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  #app {
+    display: flex;
+    flex: 1;
+    margin-top: 48px;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+    transition: margin-top 0.3s ease, height 0.3s ease;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    gap: 4px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 8px 8px 4px;
+  }
+  .project-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .project-btn:hover { background: var(--surface2); color: var(--text); }
+  .project-btn.active { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); }
+  .p-label { flex: 1; }
+  .p-edit, .p-del {
+    opacity: 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .project-btn:hover .p-edit,
+  .project-btn:hover .p-del { opacity: 1; }
+  .p-edit:hover { border-color: var(--accent); color: var(--accent); }
+  .p-del:hover { border-color: var(--red); color: var(--red); }
+  .p-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .sidebar-add {
+    margin-top: auto;
+    padding: 8px 10px;
+    border: 1px dashed var(--border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .sidebar-add:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── PAGE VIEWS ── */
+  .page { display: none; flex: 1; overflow-y: auto; padding: 24px; flex-direction: column; gap: 20px; height: 100%; }
+  .page.active { display: flex; }
+
+  /* ── OVERVIEW PAGE ── */
+  .page-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
+  }
+  .page-title {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+  }
+  .project-name-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ── GRID LAYOUT (matches whiteboard sketch) ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1.2fr;
+    grid-template-rows: auto auto 220px auto auto;
+    gap: 14px;
+    flex: 1;
+  }
+  .area-replied  { grid-column: 1; grid-row: 1; }
+  .area-interest { grid-column: 1; grid-row: 2; }
+  .area-brief    { grid-column: 2; grid-row: 1 / 4; display: flex; flex-direction: column; }
+  .area-calendar { grid-column: 3; grid-row: 1 / 4; }
+  .area-todo     { grid-column: 1; grid-row: 3; display: flex; flex-direction: column; height: 220px; overflow: hidden; }
+  .area-todo .todo-list { flex: 1; overflow-y: auto; min-height: 0; }
+  .area-progress { grid-column: 1 / 4; grid-row: 4; }
+  .area-user     { grid-column: 1 / 4; grid-row: 5; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* Status card */
+  .status-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .status-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .status-icon.replied { background: rgba(62,207,106,0.15); }
+  .status-icon.no-reply { background: rgba(232,84,84,0.15); }
+  .status-label { font-size: 13px; font-weight: 600; }
+  .status-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
+
+  .interest-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .interest-badge.interested { background: rgba(62,207,106,0.15); color: var(--green); border: 1px solid rgba(62,207,106,0.3); }
+  .interest-badge.not-interested { background: rgba(232,84,84,0.15); color: var(--red); border: 1px solid rgba(232,84,84,0.3); }
+  .interest-badge.pending { background: rgba(196,160,53,0.15); color: var(--pending); border: 1px solid rgba(196,160,53,0.3); }
+
+  .change-status-btn {
+    margin-top: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .change-status-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Brief card */
+  .brief-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 80px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+  .brief-text[contenteditable]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .edit-hint { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+  /* Calendar card */
+  .calendar-wrap { grid-column: span 1; }
+  .cal-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  }
+  .cal-month { font-size: 14px; font-weight: 700; }
+  .cal-nav { background: none; border: 1px solid var(--border); color: var(--text-dim); border-radius: 5px; width: 24px; height: 24px; cursor: pointer; font-size: 12px; }
+  .cal-nav:hover { border-color: var(--accent); color: var(--accent); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-day-name { font-size: 9px; text-align: center; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; padding: 2px 0 4px; }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-dim);
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .cal-day:hover { background: var(--surface2); color: var(--text); }
+  .cal-day.today { background: var(--accent); color: #000; font-weight: 700; }
+  .cal-day.has-meeting { border-color: var(--blue); color: var(--blue); }
+  .cal-day.empty { cursor: default; }
+
+  /* To-do card */
+  .todo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .todo-item:hover { border-color: var(--border); }
+  .todo-check {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    font-size: 10px;
+  }
+  .todo-check.done { background: var(--green); border-color: var(--green); color: #000; }
+  .todo-text { font-size: 13px; flex: 1; }
+  .todo-text.done { text-decoration: line-through; color: var(--text-muted); }
+  .todo-del { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+  .todo-item:hover .todo-del { opacity: 1; }
+  .todo-add {
+    display: flex; gap: 6px;
+  }
+  .todo-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+  }
+  .todo-input:focus { outline: none; border-color: var(--accent); }
+  .todo-input::placeholder { color: var(--text-muted); }
+  .todo-input-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: 700;
+    font-size: 16px;
+    width: 30px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .todo-input-btn:hover { opacity: 0.85; }
+
+  /* Progress card */
+  .progress-section { grid-column: span 2; }
+  .progress-label-row {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+  }
+  .progress-pct { font-size: 24px; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; font-family: 'DM Mono', monospace; }
+  .progress-bar-bg {
+    height: 12px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+  .progress-milestones {
+    display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .milestone {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+  .milestone-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* ── CALENDAR PAGE ── */
+  .cal-page-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+  }
+  .meeting-list { display: flex; flex-direction: column; gap: 8px; }
+  .meeting-item {
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    border-left: 3px solid var(--blue);
+  }
+  .meeting-title { font-size: 13px; font-weight: 600; }
+  .meeting-meta { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 3px; }
+  .add-meeting-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; display: block; }
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+  }
+  .form-input:focus { outline: none; border-color: var(--accent); }
+  .form-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .form-btn:hover { opacity: 0.85; }
+
+  /* ── OUTREACH PAGE ── */
+  .outreach-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .outreach-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .outreach-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .outreach-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .outreach-card:hover::before { opacity: 1; }
+  .oc-project { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  .oc-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .oc-brief { font-size: 12px; color: var(--text-dim); font-family: 'DM Mono', monospace; line-height: 1.4; margin-bottom: 10px; }
+  .oc-footer { display: flex; align-items: center; justify-content: space-between; }
+  .oc-link {
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    width: 360px;
+    max-width: 90vw;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .modal-close {
+    float: right;
+    background: none; border: none;
+    color: var(--text-dim);
+    font-size: 20px; cursor: pointer;
+  }
+  .status-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+  .status-option:hover { border-color: var(--accent); }
+  .status-option span { font-size: 14px; font-weight: 600; }
+
+  /* Large calendar for full page */
+  .big-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .big-cal-day {
+    min-height: 80px;
+    padding: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .big-cal-day:hover { border-color: var(--accent); }
+  .big-cal-day.today { border-color: var(--accent); }
+  .big-cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+  .big-day-num { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text-muted); margin-bottom: 4px; }
+  .big-day-num.today-num { color: var(--accent); font-weight: 700; }
+  .big-meeting-pill {
+    font-size: 10px;
+    background: rgba(91,142,240,0.2);
+    border: 1px solid rgba(91,142,240,0.4);
+    color: var(--blue);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .sent-log-item {
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    border-left: 3px solid var(--green);
+  }
+  .sent-log-item .log-email { font-size: 12px; font-weight: 600; }
+  .sent-log-item .log-meta { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .log-view-btn { font-size: 11px; color: var(--blue); cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
+
+  .saved-pitch-item {
+    padding: 7px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .saved-pitch-item:hover { border-color: var(--accent); }
+  .saved-pitch-item .sp-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .saved-pitch-item .sp-preview { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tone-opt {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    background: var(--surface2);
+  }
+  .tone-opt:hover { border-color: var(--accent); color: var(--text); }
+  .tone-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(240,165,0,0.08); }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--accent); transform: scale(1.1); }
+  [data-theme="light"] .page-title,
+  [data-theme="light"] .tab-logo {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -0.02em;
+  }
+  [data-theme="light"] .tab-logo {
+    font-size: 17px;
+    color: var(--accent);
+  }
+  [data-theme="light"] .card {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  [data-theme="light"] .card:hover {
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  }
+  [data-theme="light"] .project-btn.active {
+    background: linear-gradient(135deg, rgba(232,56,10,0.08), rgba(253,184,39,0.08));
+    border-color: var(--accent);
+  }
+  /* Dark theme: cyan accent glow on active elements */
+  body:not([data-theme="light"]) .tab-btn.active {
+    color: var(--accent);
+    border-color: rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.06);
+    text-shadow: 0 0 12px rgba(0,229,255,0.4);
+  }
+  body:not([data-theme="light"]) .project-btn.active {
+    color: var(--accent);
+    border-color: rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.05);
+  }
+  body:not([data-theme="light"]) .todo-input-btn,
+  body:not([data-theme="light"]) .form-btn {
+    background: var(--accent);
+    color: #000;
+    box-shadow: 0 0 16px rgba(0,229,255,0.3);
+  }
+  body:not([data-theme="light"]) .interest-badge.interested {
+    box-shadow: 0 0 10px rgba(0,229,160,0.2);
+  }
+  /* Light theme: rainbow progress bars */
+  [data-theme="light"] .progress-bar-fill {
+    background: linear-gradient(90deg, var(--r6), var(--r5), var(--r4), var(--r3), var(--r2), var(--r1));
+  }
+  [data-theme="light"] .cal-day.today {
+    background: var(--r4);
+    color: #fff;
+  }
+
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+
+  /* ── FINANCE PAGE ── */
+  .finance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .stat-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: -0.03em; }
+  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .finance-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .finance-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .finance-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .finance-table tr:last-child td { border-bottom: none; }
+  .finance-table tr:hover td { background: var(--surface2); }
+  .badge-paid { background: rgba(62,207,106,0.12); color: var(--green); border: 1px solid rgba(62,207,106,0.25); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .badge-pending { background: rgba(196,160,53,0.12); color: var(--pending); border: 1px solid rgba(196,160,53,0.25); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .badge-overdue { background: rgba(232,84,84,0.12); color: var(--red); border: 1px solid rgba(232,84,84,0.25); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .finance-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .add-entry-btn { background: none; border: 1px dashed var(--border); border-radius: 6px; color: var(--text-muted); font-family: 'Syne', sans-serif; font-size: 12px; padding: 7px 14px; cursor: pointer; transition: all 0.2s; }
+  .add-entry-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .profit-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .profit-bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .profit-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--s1), var(--s2), var(--s3), var(--s4)); transition: width 0.5s ease; }
+</style>
+</head>
+<body>
+
+<!-- TASKBAR -->
+<div id="taskbar">
+  <span class="tab-logo">⬡ Reachr.</span>
+  <button class="tab-btn active" onclick="switchTab('overview')">Project Overview</button>
+  <button class="tab-btn" onclick="switchTab('pitches')">Pitches</button>
+  <button class="tab-btn" onclick="switchTab('summaries')">Summaries</button>
+  <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
+  <button class="tab-btn" onclick="switchTab('outreach')">Outreach</button>
+  <button class="tab-btn" onclick="switchTab('finance')">Finance</button>
+  <button class="tab-btn" onclick="switchTab('analytics')">Analytics</button>
+  <div class="tab-spacer"></div>
+  <button id="api-settings-btn" onclick="toggleApiSettings()" style="font-size:11px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);padding:4px 10px;cursor:pointer;font-family:'DM Mono',monospace;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'" title="AI Settings">⚙ AI</button>
+  <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  <span class="tab-clock" id="clock">--:--</span>
+</div>
+
+<!-- API SETTINGS PANEL -->
+<div id="api-settings-panel" style="display:none;position:fixed;top:54px;right:16px;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+    AI Provider
+    <button onclick="toggleApiSettings()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;">×</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <div id="provider-claude" onclick="setProvider('claude')" style="flex:1;padding:8px;border:2px solid var(--accent);border-radius:8px;cursor:pointer;text-align:center;background:rgba(232,213,160,0.06);">
+      <div style="font-size:13px;font-weight:700;">Claude</div>
+      <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Anthropic</div>
+    </div>
+    <div id="provider-openai" onclick="setProvider('openai')" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;">
+      <div style="font-size:13px;font-weight:700;">GPT-5 Nano</div>
+      <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">OpenAI · $0.05/1M</div>
+    </div>
+  </div>
+  <div id="api-key-claude-group">
+    <label style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:5px;">Anthropic API Key</label>
+    <input id="api-key-claude" type="password" class="form-input" placeholder="sk-ant-..." style="margin-bottom:10px;">
+  </div>
+  <div id="api-key-openai-group" style="display:none;">
+    <label style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:5px;">OpenAI API Key</label>
+    <input id="api-key-openai" type="password" class="form-input" placeholder="sk-..." style="margin-bottom:10px;">
+  </div>
+  <button class="form-btn" style="width:100%;" onclick="saveApiSettings()">Save</button>
+  <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:8px;text-align:center;line-height:1.5;">Keys stored locally in your browser only.<br>Never sent anywhere except the AI provider.</div>
+</div>
+<div id="taskbar-trigger"></div>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-label">Projects</div>
+    <div id="project-list"></div>
+    <button class="sidebar-add" onclick="addProject()">+ New Project</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+
+    <!-- ── OVERVIEW PAGE ── -->
+    <div class="page active" id="page-overview">
+      <div class="page-header">
+        <div class="page-title">Project Overview</div>
+        <div class="project-name-tag" id="active-project-tag">P1</div>
+      </div>
+
+      <div class="overview-grid">
+
+        <!-- COL 1 ROW 1: Email reply + work timer -->
+        <div class="area-replied" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="card" style="min-width:0;">
+            <div class="card-title">Email Reply</div>
+            <div class="status-row" style="margin-bottom:0">
+              <div class="status-icon replied" id="email-icon">✓</div>
+              <div style="min-width:0;">
+                <div class="status-label" id="email-status-text">No Reply Yet</div>
+                <div class="status-sub" id="email-date">No reply recorded</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="min-width:0;">
+            <div class="card-title">Work Timer</div>
+            <div id="work-timer-display" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.03em;margin-bottom:10px;">00:00:00</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="change-status-btn" id="timer-btn" style="margin-top:0;" onclick="toggleTimer()">Start</button>
+              <button class="change-status-btn" style="margin-top:0;" onclick="resetTimer()">Reset</button>
+            </div>
+            <div id="work-timer-sub" style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:8px;">Tracked per project</div>
+          </div>
+        </div>
+
+        <!-- COL 1 ROW 2: Interest level -->
+        <div class="card area-interest">
+          <div class="card-title">Interest</div>
+          <div id="interest-display" style="margin-bottom:10px;">
+            <div class="interest-badge interested" id="interest-badge">● Pending</div>
+          </div>
+          <button class="change-status-btn" onclick="openStatusModal()">Change Status</button>
+        </div>
+
+        <!-- COL 1 ROW 2: To-Do -->
+        <div class="card area-todo">
+          <div class="card-title">To-Do List</div>
+          <div class="todo-list" id="todo-list" style="flex:1;overflow-y:auto;"></div>
+          <div class="todo-add">
+            <input class="todo-input" id="todo-input" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTodo()">
+            <button class="todo-input-btn" onclick="addTodo()">+</button>
+          </div>
+        </div>
+
+        <!-- COL 2 ROWS 1-2: Client Brief -->
+        <div class="card area-brief">
+          <div class="card-title">Client Brief</div>
+          <div class="brief-text" id="brief-text" contenteditable="true" style="flex:1;min-height:120px;">Add the client brief here...</div>
+          <div class="edit-hint">click to edit</div>
+        </div>
+
+        <!-- COL 3 ROWS 1-2: Calendar -->
+        <div class="card area-calendar">
+          <div class="card-title">Schedule</div>
+          <div class="cal-header">
+            <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+            <div class="cal-month" id="mini-cal-month">March 2026</div>
+            <button class="cal-nav" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="mini-cal">
+            <div class="cal-day-name">Su</div>
+            <div class="cal-day-name">Mo</div>
+            <div class="cal-day-name">Tu</div>
+            <div class="cal-day-name">We</div>
+            <div class="cal-day-name">Th</div>
+            <div class="cal-day-name">Fr</div>
+            <div class="cal-day-name">Sa</div>
+          </div>
+        </div>
+
+        <!-- ROW 4: Client Details -->
+        <div class="area-user" style="padding:14px 16px;">
+  <div class="card-title">Client Details</div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;">
+    <div>
+      <label class="form-label" style="margin-bottom:6px;">Client Name</label>
+      <input id="meta-client-name" class="form-input" placeholder="e.g. Sarah" oninput="saveProjectMeta()">
+    </div>
+    <div>
+      <label class="form-label" style="margin-bottom:6px;">Client Email</label>
+      <input id="meta-client-email" class="form-input" placeholder="e.g. hello@business.com" oninput="saveProjectMeta()">
+    </div>
+    <div>
+      <label class="form-label" style="margin-bottom:6px;">Business Type</label>
+      <input id="meta-biz-type" class="form-input" placeholder="e.g. Restaurant" oninput="saveProjectMeta()">
+    </div>
+    <div>
+      <label class="form-label" style="margin-bottom:6px;">Payment Type</label>
+      <select id="meta-payment-type" class="form-input" onchange="togglePaymentFields()">
+        <option value="one-time">One-time Payment</option>
+        <option value="monthly">Monthly Payment</option>
+        <option value="mixed">One-time + Monthly</option>
+      </select>
+    </div>
+    <div id="one-time-field">
+      <label class="form-label" style="margin-bottom:6px;">One-time Amount (R)</label>
+      <input id="meta-client-payment" class="form-input" type="number" min="0" step="0.01" placeholder="e.g. 12000" oninput="saveProjectMeta()">
+    </div>
+    <div id="monthly-field" style="display:none;">
+      <label class="form-label" style="margin-bottom:6px;">Monthly Amount (R)</label>
+      <input id="meta-monthly-payment" class="form-input" type="number" min="0" step="0.01" placeholder="e.g. 800" oninput="saveProjectMeta()">
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:10px;">Fill in the client details once and the rest of the app stays in sync.</div>
+</div>
+
+        <!-- ROW 5: Progress bar full width -->
+        <div class="card area-progress">
+          <div class="card-title">Project Progress</div>
+          <div class="progress-label-row">
+            <span style="font-size:13px;color:var(--text-dim)" id="progress-task-count">Based on to-do list</span>
+            <span class="progress-pct" id="progress-pct">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- ROW 6: Project finance overview -->
+        <div class="card area-user" style="padding:14px 16px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div class="card-title">Project Money Snapshot</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">Income and expenses for this specific project, synced with Finance, Summaries, and Analytics.</div>
+            </div>
+            <button class="change-status-btn" style="padding:6px 12px;font-size:11px;" onclick="switchTab('finance')">Open Finance Tab</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;">
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">Income</div>
+              <div id="project-finance-income" style="font-size:22px;font-weight:800;margin-top:8px;">R0.00</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:4px;">Client payment recorded on this project</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">Expenses</div>
+              <div id="project-finance-expenses" style="font-size:22px;font-weight:800;margin-top:8px;">R0.00</div>
+              <div id="project-finance-expense-count" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:4px;">0 linked expense entries</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">Net</div>
+              <div id="project-finance-profit" style="font-size:22px;font-weight:800;margin-top:8px;">R0.00</div>
+              <div id="project-finance-profit-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:4px;">Income minus expenses</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">Linked expense log</div>
+              <div id="project-finance-last-updated" style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Waiting for money to happen</div>
+            </div>
+            <div id="project-finance-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── PITCHES PAGE ── -->
+    <div class="page" id="page-pitches">
+      <div class="page-header">
+        <div class="page-title">Pitches</div>
+        <button class="form-btn" style="font-size:12px;padding:6px 14px;" onclick="openNewPitchModal()">+ New Pitch</button>
+      </div>
+
+      <!-- pitch grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;overflow-y:auto;padding-bottom:20px;" id="pitch-blocks-grid"></div>
+
+      <!-- view/edit pitch modal -->
+      <div class="modal-overlay" id="pitch-modal">
+        <div class="modal" style="width:520px;max-width:95vw;">
+          <button class="modal-close" onclick="document.getElementById('pitch-modal').classList.remove('open')">×</button>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div id="pitch-modal-icon" style="font-size:22px;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div id="pitch-modal-title" style="font-size:16px;font-weight:800;"></div>
+              <div id="pitch-modal-tag" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:2px;"></div>
+            </div>
+            <button id="pitch-modal-delete-btn" style="background:none;border:1px solid rgba(221,51,34,0.3);border-radius:6px;color:var(--red);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Syne',sans-serif;" onmouseover="this.style.background='rgba(221,51,34,0.1)'" onmouseout="this.style.background='none'" onclick="deleteActivePitch()">Delete</button>
+          </div>
+          <div id="pitch-modal-body" style="font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;max-height:340px;overflow-y:auto;margin-bottom:14px;"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="form-btn" style="flex:1;" id="pitch-modal-copy-btn" onclick="copyActivePitch()">Copy Pitch</button>
+            <button class="change-status-btn" id="pitch-modal-use-btn" onclick="usePitchForOutreach()">Use for Outreach →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- new pitch modal -->
+      <div class="modal-overlay" id="new-pitch-modal">
+        <div class="modal" style="width:500px;max-width:95vw;">
+          <button class="modal-close" onclick="document.getElementById('new-pitch-modal').classList.remove('open')">×</button>
+          <div class="modal-title">New Pitch</div>
+          <div class="form-group">
+            <label class="form-label">Business Type</label>
+            <input class="form-input" id="new-pitch-label" placeholder="e.g. Restaurant, Gym, Law Firm...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tag / Niche</label>
+            <input class="form-input" id="new-pitch-tag" placeholder="e.g. Food & Hospitality · Local">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hook (one line summary)</label>
+            <input class="form-input" id="new-pitch-hook" placeholder="e.g. Turn walk-ins into loyal regulars online.">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject Line</label>
+            <input class="form-input" id="new-pitch-subject" placeholder="e.g. A website that works as hard as you do">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pitch Body</label>
+            <textarea id="new-pitch-body" style="width:100%;height:160px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;" placeholder="Write your full pitch here. Use {name} where you want the client's name to appear."></textarea>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <label class="form-label" style="margin:0;align-self:center;">Icon</label>
+            <input class="form-input" id="new-pitch-icon" placeholder="e.g. 🍕" style="width:80px;text-align:center;font-size:18px;">
+            <label class="form-label" style="margin:0 0 0 10px;align-self:center;">Colour</label>
+            <input type="color" id="new-pitch-color" value="#f0a800" style="width:44px;height:36px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);cursor:pointer;padding:2px;">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="form-btn" style="flex:1;" onclick="saveNewPitch()">✦ Save Pitch</button>
+            <button class="change-status-btn" onclick="generatePitchWithAI()">✦ Generate with AI</button>
+          </div>
+          <div id="new-pitch-ai-status" style="display:none;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:8px;text-align:center;"></div>
+        </div>
+      </div>
+    </div><!-- end pitches page -->
+
+    <!-- ── SUMMARIES PAGE ── -->
+    <div class="page" id="page-summaries">
+      <div class="page-header">
+        <div class="page-title">Summaries</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;overflow-y:auto;padding-bottom:20px;" id="summaries-grid"></div>
+    </div>
+
+    <!-- ── CALENDAR PAGE ── -->
+    <div class="page" id="page-calendar">
+      <div class="page-header">
+        <div class="page-title">Calendar</div>
+      </div>
+      <div class="cal-page-grid">
+        <div>
+          <div class="section-title">Schedule Event</div>
+          <div class="add-meeting-form">
+            <div class="form-group">
+              <label class="form-label">Event Title</label>
+              <input class="form-input" id="meeting-title" placeholder="e.g. Kickoff Call, Site Review...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Project / Client</label>
+              <input class="form-input" id="meeting-project" placeholder="e.g. P1 — Acme Corp">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input class="form-input" id="meeting-date" type="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Time</label>
+              <input class="form-input" id="meeting-time" type="time">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <input class="form-input" id="meeting-notes" placeholder="e.g. Zoom link, agenda...">
+            </div>
+            <button class="form-btn" onclick="addMeeting()">Schedule</button>
+          </div>
+
+          <div style="margin-top:16px">
+            <div class="section-title">Upcoming</div>
+            <div class="meeting-list" id="meeting-list"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="cal-header" style="margin-bottom:10px">
+            <button class="cal-nav" onclick="changeBigMonth(-1)">‹</button>
+            <div class="cal-month" id="big-cal-month">March 2026</div>
+            <button class="cal-nav" onclick="changeBigMonth(1)">›</button>
+          </div>
+          <div class="big-cal-grid" id="big-cal-names">
+            <div class="cal-day-name">Sun</div><div class="cal-day-name">Mon</div><div class="cal-day-name">Tue</div>
+            <div class="cal-day-name">Wed</div><div class="cal-day-name">Thu</div><div class="cal-day-name">Fri</div>
+            <div class="cal-day-name">Sat</div>
+          </div>
+          <div class="big-cal-grid" id="big-cal"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── OUTREACH PAGE ── -->
+    <div class="page" id="page-outreach">
+      <div class="page-header">
+        <div class="page-title">Outreach</div>
+      </div>
+
+      <!-- Setup: just gmail address -->
+      <div id="outreach-setup" style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <div style="width:420px;">
+          <div style="text-align:center;margin-bottom:28px;">
+            <div style="width:56px;height:56px;background:rgba(232,213,160,0.1);border:1px solid rgba(232,213,160,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✉</div>
+            <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;">Set Up Outreach</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.7;">Enter your Gmail address. When you send outreach, Gmail opens in a new tab with the AI-written email ready — just hit Send in Gmail.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;">
+            <div class="form-group">
+              <label class="form-label">Your Gmail Address</label>
+              <input class="form-input" id="gmail-address" type="email" placeholder="you@gmail.com" style="font-size:14px;padding:10px 14px;">
+            </div>
+            <button class="form-btn" style="width:100%;padding:10px;font-size:14px;" onclick="saveGmailSetup()">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div id="outreach-composer" style="display:none;flex-direction:column;flex:1;min-height:0;">
+
+        <!-- Top bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div>
+            <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text-muted);">Sending from</span>
+            <span id="outreach-from-label" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--accent);font-weight:600;"></span>
+          </div>
+          <button onclick="resetGmailSetup()" style="font-size:11px;background:none;border:1px solid var(--border);border-radius:5px;color:var(--text-muted);padding:4px 10px;cursor:pointer;font-family:'Syne',sans-serif;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">Change</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:300px 1fr 260px;gap:14px;flex:1;min-height:0;overflow:hidden;">
+
+          <!-- Col 1: Form + sent log -->
+          <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+            <div class="card">
+              <div class="card-title">New Outreach</div>
+              <div class="form-group">
+                <label class="form-label">Client Name</label>
+                <input class="form-input" id="outreach-client-name" placeholder="e.g. Sarah's Bakery">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Client Email</label>
+                <input class="form-input" id="outreach-email" type="email" placeholder="client@example.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Business Type</label>
+                <input class="form-input" id="outreach-biz" placeholder="e.g. Coffee Shop, Gym, Tailor...">
+              </div>
+              <div class="form-group" style="margin-bottom:16px;">
+                <label class="form-label">Tone</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                  <div class="tone-opt active" data-val="professional" onclick="selectTone(this)">Professional</div>
+                  <div class="tone-opt" data-val="friendly" onclick="selectTone(this)">Friendly</div>
+                  <div class="tone-opt" data-val="bold" onclick="selectTone(this)">Bold</div>
+                  <div class="tone-opt" data-val="luxury" onclick="selectTone(this)">Luxury</div>
+                </div>
+              </div>
+              <button class="form-btn" style="width:100%;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="sendOutreach()">
+                ✦ Generate &amp; Open in Gmail
+              </button>
+            </div>
+
+            <div class="card" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+              <div class="card-title">Sent Log</div>
+              <div id="outreach-sent-log" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+                <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:center;padding-top:12px;">No emails sent yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col 2: Status -->
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(232,213,160,0.03) 0%,transparent 70%);pointer-events:none;"></div>
+
+            <div id="outreach-idle" style="text-align:center;padding:20px;">
+              <div style="font-size:52px;margin-bottom:16px;opacity:0.3;">✉</div>
+              <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ready to reach out</div>
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;max-width:280px;margin:0 auto;">Fill in the form and click <span style="color:var(--accent);font-weight:600;">Generate & Open in Gmail</span>.<br><br>Gmail opens pre-filled — just hit Send.<br>A project is created automatically.</div>
+            </div>
+
+            <div id="outreach-sending" hidden style="text-align:center;padding:20px;">
+              <div class="spinner" style="width:40px;height:40px;margin:0 auto 20px;border-width:3px;"></div>
+              <div id="outreach-status-msg" style="font-size:14px;font-weight:600;margin-bottom:6px;">Writing email...</div>
+              <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;">Powered by Claude AI</div>
+            </div>
+
+            <div id="outreach-done" hidden style="text-align:center;padding:20px;">
+              <div style="width:64px;height:64px;background:rgba(62,207,106,0.12);border:1px solid rgba(62,207,106,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✓</div>
+              <div style="font-size:17px;font-weight:800;color:var(--green);margin-bottom:8px;">Gmail Opened!</div>
+              <div id="outreach-done-detail" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:20px;line-height:1.7;"></div>
+              <button class="form-btn" id="outreach-view-project-btn" style="margin-bottom:10px;width:100%;">View Project Overview →</button>
+              <button onclick="setOutreachState('idle')" style="width:100%;background:none;border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-dim);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;">Send another →</button>
+            </div>
+
+            <div id="outreach-error" hidden style="text-align:center;padding:20px;">
+              <div style="width:64px;height:64px;background:rgba(221,51,34,0.1);border:1px solid rgba(221,51,34,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✗</div>
+              <div style="font-size:15px;font-weight:700;color:var(--red);margin-bottom:8px;">Something went wrong</div>
+              <div id="outreach-error-msg" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:16px;"></div>
+              <button onclick="setOutreachState('idle')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:7px 16px;color:var(--text-dim);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;">Try again</button>
+            </div>
+          </div>
+
+          <!-- Col 3: Reply log -->
+          <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+            <div class="card-title">Log a Reply</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.6;margin-bottom:12px;">Paste the client's reply — AI will read it and automatically set their interest level, brief, and todos.</div>
+            <select class="form-input" id="reply-project-select" style="margin-bottom:8px;font-size:12px;"></select>
+            <textarea id="reply-textarea-inline" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;line-height:1.5;resize:none;min-height:80px;" placeholder="Paste their reply here..."></textarea>
+            <button id="reply-submit-inline-btn" onclick="submitInlineReply()" style="margin-top:8px;background:var(--accent);border:none;border-radius:6px;padding:8px;color:#000;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">✦ Analyse &amp; Update Project</button>
+            <div id="reply-inline-status" style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);margin-top:6px;text-align:center;min-height:16px;"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FINANCE PAGE ── -->
+    <div class="page" id="page-finance" style="gap:14px;">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;">Finance</div>
+          <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:2px;">Income · Invoices · Profit · Goals</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="openAddTransactionModal('income')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid rgba(62,207,106,0.4);border-radius:7px;background:rgba(62,207,106,0.07);color:var(--green);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(62,207,106,0.14)'" onmouseout="this.style.background='rgba(62,207,106,0.07)'">+ Income</button>
+          <button onclick="openAddTransactionModal('expense')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid rgba(232,84,84,0.4);border-radius:7px;background:rgba(232,84,84,0.07);color:var(--red);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,84,84,0.14)'" onmouseout="this.style.background='rgba(232,84,84,0.07)'">+ Expense</button>
+          <button onclick="openAddInvoiceModal()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text-dim);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">+ Invoice</button>
+        </div>
+      </div>
+
+      <!-- Row 1: 4 stat cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:linear-gradient(135deg,rgba(91,142,240,0.12),transparent);border-radius:0 12px 0 80px;"></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Total Balance</div>
+          <div style="font-size:26px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.03em;" id="fin-balance">R0.00</div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;margin-top:6px;display:flex;align-items:center;gap:4px;" id="fin-balance-sub"></div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid rgba(62,207,106,0.2);border-radius:12px;padding:18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:linear-gradient(135deg,rgba(62,207,106,0.1),transparent);border-radius:0 12px 0 80px;"></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Income</div>
+          <div style="font-size:26px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.03em;color:var(--green);" id="fin-income">R0.00</div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);margin-top:6px;" id="fin-income-sub"></div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid rgba(232,84,84,0.2);border-radius:12px;padding:18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:linear-gradient(135deg,rgba(232,84,84,0.1),transparent);border-radius:0 12px 0 80px;"></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Expenses</div>
+          <div style="font-size:26px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.03em;color:var(--red);" id="fin-expense">R0.00</div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);margin-top:6px;" id="fin-expense-sub"></div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:linear-gradient(135deg,rgba(240,165,0,0.1),transparent);border-radius:0 12px 0 80px;"></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Outstanding</div>
+          <div style="font-size:26px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.03em;color:var(--accent);" id="fin-outstanding">R0.00</div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);margin-top:6px;" id="fin-outstanding-sub"></div>
+        </div>
+
+      </div>
+
+      <!-- Row 2: Money flow + Budget donut -->
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:12px;flex-shrink:0;">
+
+        <!-- Money Flow -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <div style="font-size:14px;font-weight:700;">Money Flow</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:2px;">Last 6 months</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:11px;font-family:'DM Mono',monospace;">
+              <span style="display:flex;align-items:center;gap:5px;color:var(--text-dim);"><span style="width:10px;height:4px;border-radius:2px;background:var(--green);display:inline-block;"></span>Income</span>
+              <span style="display:flex;align-items:center;gap:5px;color:var(--text-dim);"><span style="width:10px;height:4px;border-radius:2px;background:var(--red);display:inline-block;"></span>Expense</span>
+            </div>
+          </div>
+          <div style="position:relative;height:130px;" id="money-flow-chart">
+            <canvas id="money-flow-canvas" style="width:100%;height:100%;"></canvas>
+          </div>
+          <div id="money-flow-labels" style="display:flex;justify-content:space-around;margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.04em;"></div>
+        </div>
+
+        <!-- Budget donut -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;">Budget Split</div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="position:relative;width:100px;height:100px;flex-shrink:0;">
+              <canvas id="budget-donut-canvas" width="100" height="100"></canvas>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+                <div style="font-size:9px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.2;">Total<br>spent</div>
+                <div style="font-size:13px;font-weight:800;margin-top:2px;" id="budget-total-label">R0</div>
+              </div>
+            </div>
+            <div id="budget-legend" style="flex:1;display:flex;flex-direction:column;gap:7px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Invoices + Profit by project + Saving goals -->
+      <div style="display:grid;grid-template-columns:1fr 220px 220px;gap:12px;flex:1;min-height:0;overflow:hidden;">
+
+        <!-- Invoices -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0;">
+            <div style="font-size:14px;font-weight:700;">Invoices</div>
+            <button onclick="openAddInvoiceModal()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text-dim);font-family:'Syne',sans-serif;cursor:pointer;font-weight:600;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">+ Invoice</button>
+          </div>
+          <div style="flex:1;overflow-y:auto;">
+            <table class="finance-table" id="invoice-table">
+              <thead><tr><th>Project</th><th>Description</th><th>Amount</th><th>Frequency</th><th>Date</th><th>Status</th><th></th></tr></thead>
+              <tbody id="invoice-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Profit by project -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;flex-shrink:0;">Profit / Project</div>
+          <div id="profit-bars" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+
+        <!-- Saving goals -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0;">
+            <div style="font-size:14px;font-weight:700;">Saving Goals</div>
+            <button onclick="openAddGoalModal()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text-dim);font-family:'Syne',sans-serif;cursor:pointer;font-weight:600;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">+ Goal</button>
+          </div>
+          <div id="saving-goals" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS PAGE ── -->
+    <div class="page" id="page-analytics" style="gap:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;">Analytics</div>
+          <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:2px;">Replies · Revenue · Conversion by business type</div>
+        </div>
+      </div>
+
+      <div id="analytics-empty-state" class="card" style="display:none;text-align:center;padding:36px;">
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">No analytics yet</div>
+        <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.7;max-width:560px;margin:0 auto;">Start sending outreach and logging replies. Then this tab will show which business types are bringing in money, who replies most, and where your pipeline is strongest.</div>
+      </div>
+
+      <div id="analytics-content" style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;">
+          <div class="card"><div class="card-title">Top Revenue Type</div><div id="analytics-top-revenue" style="font-size:22px;font-weight:800;line-height:1.2;">—</div><div id="analytics-top-revenue-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">No data</div></div>
+          <div class="card"><div class="card-title">Most Replies</div><div id="analytics-top-replies" style="font-size:22px;font-weight:800;line-height:1.2;">—</div><div id="analytics-top-replies-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">No data</div></div>
+          <div class="card"><div class="card-title">Best Reply Rate</div><div id="analytics-best-rate" style="font-size:22px;font-weight:800;line-height:1.2;">—</div><div id="analytics-best-rate-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">No data</div></div>
+          <div class="card"><div class="card-title">Interested Leads</div><div id="analytics-top-interest" style="font-size:22px;font-weight:800;line-height:1.2;">—</div><div id="analytics-top-interest-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">No data</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:12px;min-height:0;">
+          <div class="card" style="display:flex;flex-direction:column;min-height:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:14px;font-weight:700;">Business Type Leaderboard</div>
+              <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Replies, interest, money</div>
+            </div>
+            <div style="overflow:auto;">
+              <table class="finance-table">
+                <thead><tr><th>Business Type</th><th>Sent</th><th>Replies</th><th>Reply Rate</th><th>Interested</th><th>Revenue</th></tr></thead>
+                <tbody id="analytics-type-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0;">
+            <div class="card" style="display:flex;flex-direction:column;min-height:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="font-size:14px;font-weight:700;">Revenue by Type</div>
+                <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Income only</div>
+              </div>
+              <div id="analytics-revenue-bars" style="display:flex;flex-direction:column;gap:12px;overflow:auto;"></div>
+            </div>
+
+            <div class="card" style="display:flex;flex-direction:column;min-height:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="font-size:14px;font-weight:700;">Response Rate by Type</div>
+                <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Based on sent outreach</div>
+              </div>
+              <div id="analytics-response-bars" style="display:flex;flex-direction:column;gap:12px;overflow:auto;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+          <div class="card"><div class="card-title">Total Outreach</div><div id="analytics-total-outreach" style="font-size:24px;font-weight:800;font-family:'DM Mono',monospace;">0</div><div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">Emails opened in Gmail</div></div>
+          <div class="card"><div class="card-title">Overall Reply Rate</div><div id="analytics-overall-reply-rate" style="font-size:24px;font-weight:800;font-family:'DM Mono',monospace;">0%</div><div id="analytics-overall-reply-rate-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">0 of 0 replied</div></div>
+          <div class="card"><div class="card-title">Revenue per Reply</div><div id="analytics-revenue-per-reply" style="font-size:24px;font-weight:800;font-family:'DM Mono',monospace;">R0</div><div id="analytics-revenue-per-reply-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">Useful sanity check, not magic</div></div>
+          <div class="card"><div class="card-title">Money per Minute</div><div id="analytics-money-per-minute" style="font-size:24px;font-weight:800;font-family:'DM Mono',monospace;">R0.00/min</div><div id="analytics-money-per-minute-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:6px;">R0.00 ÷ 0.0 total minutes</div></div>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:14px;font-weight:700;">Year Goal Tracker</div>
+              <div id="analytics-annual-goal-sub" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:4px;">Set a yearly target for revenue or profit.</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div style="min-width:140px;">
+                <label class="form-label" style="margin-bottom:6px;">Track</label>
+                <select id="analytics-annual-goal-type" class="form-input" onchange="saveAnnualGoalSettings()">
+                  <option value="revenue">Revenue</option>
+                  <option value="profit">Profit</option>
+                </select>
+              </div>
+              <div style="min-width:180px;">
+                <label class="form-label" style="margin-bottom:6px;">Year Target (R)</label>
+                <input id="analytics-annual-goal-target" class="form-input" type="number" min="0" step="0.01" placeholder="e.g. 120000" oninput="saveAnnualGoalSettings()">
+              </div>
+            </div>
+          </div>
+
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="height:14px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;overflow:hidden;">
+              <div id="analytics-annual-goal-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:999px;transition:width 0.4s ease;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);gap:12px;flex-wrap:wrap;">
+              <span id="analytics-annual-goal-current">R0</span>
+              <span id="analytics-annual-goal-progress-label">0% complete</span>
+              <span id="analytics-annual-goal-target-display">R0</span>
+            </div>
+            <div id="analytics-annual-goal-sub-bottom" style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:right;">Set a target to start tracking progress</div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #main -->
+</div><!-- end #app -->
+
+<!-- ADD TRANSACTION MODAL -->
+<div class="modal-overlay" id="add-transaction-modal">
+  <div class="modal" style="width:380px;">
+    <button class="modal-close" onclick="document.getElementById('add-transaction-modal').classList.remove('open')">×</button>
+    <div class="modal-title" id="txn-modal-title">Add Transaction</div>
+    <input type="hidden" id="txn-type" value="income">
+    <div class="form-group">
+      <label class="form-label">Project</label>
+      <select class="form-input" id="txn-project"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="txn-desc" placeholder="e.g. Client payment, hosting fee...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount (R)</label>
+      <input class="form-input" id="txn-amount" type="number" placeholder="e.g. 5000">
+    </div>
+    <div class="form-group" id="txn-payment-type-wrap">
+      <label class="form-label">Frequency</label>
+      <select class="form-input" id="txn-payment-type">
+        <option value="one-time">One-time</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <input class="form-input" id="txn-category" placeholder="e.g. Design, Hosting, Tools...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" id="txn-date" type="date">
+    </div>
+    <button class="form-btn" style="width:100%;" onclick="saveTransaction()">Save</button>
+  </div>
+</div>
+
+<!-- ADD SAVING GOAL MODAL -->
+<div class="modal-overlay" id="add-goal-modal">
+  <div class="modal" style="width:360px;">
+    <button class="modal-close" onclick="document.getElementById('add-goal-modal').classList.remove('open')">×</button>
+    <div class="modal-title">Add Saving Goal</div>
+    <div class="form-group">
+      <label class="form-label">Goal Name</label>
+      <input class="form-input" id="goal-name" placeholder="e.g. New laptop, Office setup...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Amount (R)</label>
+      <input class="form-input" id="goal-target" type="number" placeholder="e.g. 20000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Saved So Far (R)</label>
+      <input class="form-input" id="goal-saved" type="number" placeholder="e.g. 5000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">% of Revenue to Save</label>
+      <input class="form-input" id="goal-revenue-pct" type="number" min="0" max="100" step="0.01" placeholder="e.g. 10">
+      <div style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:5px;">This percentage of revenue will count toward this goal automatically, including monthly revenue.</div>
+    </div>
+    <button class="form-btn" style="width:100%;" onclick="saveGoal()">Save Goal</button>
+  </div>
+</div>
+
+<!-- ADD INVOICE MODAL -->
+<div class="modal-overlay" id="add-invoice-modal">
+  <div class="modal" style="width:380px;">
+    <button class="modal-close" onclick="document.getElementById('add-invoice-modal').classList.remove('open')">×</button>
+    <div class="modal-title">Add Invoice</div>
+    <div class="form-group">
+      <label class="form-label">Project</label>
+      <select class="form-input" id="inv-project"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount (R)</label>
+      <input class="form-input" id="inv-amount" type="number" placeholder="e.g. 12000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Frequency</label>
+      <select class="form-input" id="inv-payment-type">
+        <option value="one-time">One-time</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="inv-desc" placeholder="e.g. Phase 1 — Design">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" id="inv-date" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="inv-status">
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="overdue">Overdue</option>
+      </select>
+    </div>
+    <button class="form-btn" style="width:100%;" onclick="saveInvoice()">Save Invoice</button>
+  </div>
+</div>
+
+<!-- RENAME MODAL -->
+<div class="modal-overlay" id="rename-modal">
+  <div class="modal" style="width:300px">
+    <button class="modal-close" onclick="document.getElementById('rename-modal').classList.remove('open')">×</button>
+    <div class="modal-title">Rename Project</div>
+    <div class="form-group">
+      <label class="form-label">New Name</label>
+      <input class="form-input" id="rename-input" placeholder="e.g. Acme Corp">
+    </div>
+    <button class="form-btn" id="rename-confirm">Rename</button>
+  </div>
+</div>
+
+<!-- MINI SCHEDULER MODAL -->
+<div class="modal-overlay" id="mini-scheduler-modal">
+  <div class="modal" style="width:340px">
+    <button class="modal-close" onclick="document.getElementById('mini-scheduler-modal').classList.remove('open')">×</button>
+    <div class="modal-title">Schedule Event</div>
+    <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:14px" id="mini-sched-date"></div>
+    <div class="form-group">
+      <label class="form-label">Event Title</label>
+      <input class="form-input" id="mini-sched-title" placeholder="e.g. Kickoff call, Site review...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Project / Client</label>
+      <input class="form-input" id="mini-sched-project" placeholder="e.g. P1 — Acme Corp">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Time</label>
+      <input class="form-input" id="mini-sched-time" type="time">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="mini-sched-notes" placeholder="e.g. Zoom link, agenda...">
+    </div>
+    <button class="form-btn" style="width:100%;" onclick="saveMiniMeeting()">Add to Calendar</button>
+  </div>
+</div>
+
+<!-- STATUS MODAL -->
+<div class="modal-overlay" id="status-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Update Client Status</div>
+
+    <div style="margin-bottom:12px">
+      <div class="form-label">Email Reply</div>
+      <div class="status-option" onclick="setEmailStatus('replied')">
+        <span style="color:var(--green)">✓</span>
+        <span>Replied</span>
+      </div>
+      <div class="status-option" onclick="setEmailStatus('no-reply')">
+        <span style="color:var(--red)">✗</span>
+        <span>No Reply</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="form-label">Interest Level</div>
+      <div class="status-option" onclick="setInterest('interested')">
+        <span style="color:var(--green)">●</span>
+        <span>Interested</span>
+      </div>
+      <div class="status-option" onclick="setInterest('pending')">
+        <span style="color:var(--pending)">●</span>
+        <span>Pending / Not Sure</span>
+      </div>
+      <div class="status-option" onclick="setInterest('not-interested')">
+        <span style="color:var(--red)">●</span>
+        <span>Not Interested</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── PERSISTENCE ──
+const STORAGE_KEY = 'dealpilot_clean_slate_v1';
+
+const DEFAULT_STATE = {
+  projects: {
+    P1: {
+      color: '#f0a500',
+      emailReplied: false,
+      interest: 'pending',
+      payment: 0,
+      brief: '',
+      progress: 0,
+      todos: [],
+      meetings: [],
+      clientName: '',
+      clientEmail: '',
+      bizType: '',
+      paymentMode: 'one-time',
+      monthlyPayment: 0
+    },
+  },
+  activeProject: 'P1',
+  sentLog: [],
+  financeData: {
+    invoices: [],
+    transactions: [],
+    goals: [],
+    nextId: 1
+  },
+  gmailUser: '',
+  gmailClientId: '',
+  userNote: ''
+};
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+        const saved = JSON.parse(raw);
+        // ✅ MERGE projects: keep existing defaults but add any new projects from saved
+        const mergedProjects = { ...DEFAULT_STATE.projects, ...(saved.projects || {}) };
+        return {
+            ...DEFAULT_STATE,
+            ...saved,
+            projects: mergedProjects,
+            financeData: { ...DEFAULT_STATE.financeData, ...(saved.financeData || {}) }
+        };
+    } catch(e) {
+        console.warn('Failed to load state:', e);
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      projects, activeProject, sentLog, financeData,
+      gmailUser, gmailClientId, theme: currentTheme,
+      customPitches, aiProvider, apiKeyC: apiKeyClaude, apiKeyO: apiKeyOpenAI,
+      userNote: document.getElementById('user-input')?.value || ''
+    }));
+  } catch(e) {
+    console.warn('Failed to save state:', e);
+  }
+}
+
+// Auto-save every 3 seconds and on any user action
+setInterval(saveState, 3000);
+window.addEventListener('beforeunload', saveState);
+
+// ── LOAD SAVED STATE ──
+const _state = loadState();
+const projects = _state.projects;
+let activeProject = _state.activeProject || 'P1';
+const sentLog = _state.sentLog || [];
+const financeData = _state.financeData;
+if (!financeData.annualGoal) financeData.annualGoal = { type: 'revenue', target: 0 };
+financeData.annualGoal.type = financeData.annualGoal.type === 'profit' ? 'profit' : 'revenue';
+financeData.annualGoal.target = Number(financeData.annualGoal.target) || 0;
+let gmailUser = _state.gmailUser || '';
+let gmailClientId = _state.gmailClientId || '';
+
+// Fix: ensure all projects have meetings/todos and all meetings have IDs
+Object.entries(projects).forEach(([projectName, p]) => {
+  if (!p.meetings) p.meetings = [];
+  if (!p.todos) p.todos = [];
+  if (!('clientName' in p)) p.clientName = '';
+  if (!('clientEmail' in p)) p.clientEmail = '';
+  if (!('bizType' in p)) p.bizType = '';
+  if (!('payment' in p)) {
+    const seededIncome = (financeData.transactions || []).filter(t => t && t.type === 'income' && t.project === projectName).reduce((s,t) => s + (Number(t.amount) || 0), 0);
+    p.payment = seededIncome;
+  }
+  if (!('paymentMode' in p)) p.paymentMode = 'one-time';
+  if (!('monthlyPayment' in p)) p.monthlyPayment = 0;
+  if (!('timeSpentSeconds' in p)) p.timeSpentSeconds = Number(p.timeSpent || 0) || 0;
+  p.paymentMode = p.paymentMode === 'monthly' ? 'monthly' : 'one-time';
+  p.payment = Number(p.payment) || 0;
+  p.monthlyPayment = Number(p.monthlyPayment) || 0;
+  p.timeSpentSeconds = Number(p.timeSpentSeconds) || 0;
+  p.meetings.forEach((m, i) => { if (!m.id) m.id = Date.now() + i; });
+});
+
+let miniCalDate = new Date();
+let bigCalDate = new Date();
+
+let workTimerInterval = null;
+let workTimerRunning = false;
+
+function formatWorkTime(totalSeconds) {
+  const safe = Math.max(0, Number(totalSeconds) || 0);
+  const h = String(Math.floor(safe / 3600)).padStart(2, '0');
+  const m = String(Math.floor((safe % 3600) / 60)).padStart(2, '0');
+  const s = String(safe % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function stopWorkTimer(save = true) {
+  if (workTimerInterval) {
+    clearInterval(workTimerInterval);
+    workTimerInterval = null;
+  }
+  workTimerRunning = false;
+  const btn = document.getElementById('timer-btn');
+  if (btn) btn.textContent = 'Start';
+  if (save) saveState();
+}
+
+function updateWorkTimerUI() {
+  const p = projects[activeProject];
+  const totalSeconds = Number(p?.timeSpentSeconds) || 0;
+  const display = document.getElementById('work-timer-display');
+  const sub = document.getElementById('work-timer-sub');
+  const btn = document.getElementById('timer-btn');
+  if (display) display.textContent = formatWorkTime(totalSeconds);
+  if (sub) {
+    const mins = totalSeconds ? Math.max(1, Math.floor(totalSeconds / 60)) : 0;
+    sub.textContent = mins ? `${mins} total minute${mins === 1 ? '' : 's'} logged on ${activeProject}` : `Tracked per project`;
+  }
+  if (btn) btn.textContent = workTimerRunning ? 'Stop' : 'Start';
+}
+
+function toggleTimer() {
+  const p = projects[activeProject];
+  if (!p) return;
+  if (workTimerRunning) {
+    stopWorkTimer();
+    updateWorkTimerUI();
+    if (currentTab === 'analytics') renderAnalytics();
+    return;
+  }
+  stopWorkTimer(false);
+  workTimerRunning = true;
+  updateWorkTimerUI();
+  workTimerInterval = setInterval(() => {
+    const project = projects[activeProject];
+    if (!project) return;
+    project.timeSpentSeconds = (Number(project.timeSpentSeconds) || 0) + 1;
+    updateWorkTimerUI();
+    if (currentTab === 'analytics') renderAnalytics();
+  }, 1000);
+}
+
+function resetTimer() {
+  const p = projects[activeProject];
+  if (!p) return;
+  p.timeSpentSeconds = 0;
+  stopWorkTimer(false);
+  updateWorkTimerUI();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+
+function getProjectIncomeTransactions(projectName) {
+  return (financeData.transactions || [])
+    .filter(t => t && t.type === 'income' && t.project === projectName)
+    .map(t => ({ ...t, amount: Number(t.amount) || 0 }));
+}
+
+function getProjectPayment(projectName) {
+  const incomeTxns = getProjectIncomeTransactions(projectName);
+  if (incomeTxns.length) return incomeTxns.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+  const p = projects[projectName] || {};
+  return (p.paymentMode || 'one-time') === 'monthly'
+    ? (Number(p.monthlyPayment) || 0)
+    : (Number(p.payment) || 0);
+}
+
+function getProjectPaymentMode(projectName) {
+  const incomeTxns = getProjectIncomeTransactions(projectName);
+  if (incomeTxns.some(t => (t.paymentType || 'one-time') === 'monthly')) return 'monthly';
+  return (projects[projectName]?.paymentMode || 'one-time') === 'monthly' ? 'monthly' : 'one-time';
+}
+
+function getProjectPaymentLabel(projectName) {
+  const amount = getProjectPayment(projectName);
+  return getProjectPaymentMode(projectName) === 'monthly' ? `${fmt(amount)}/mo` : fmt(amount);
+}
+
+function getProjectExpenseTransactions(projectName) {
+  return (financeData.transactions || [])
+    .filter(t => t && t.type === 'expense' && t.project === projectName)
+    .map(t => ({ ...t, amount: Number(t.amount) || 0 }));
+}
+
+function renderProjectFinanceOverview() {
+  const projectName = activeProject;
+  const project = projects[projectName];
+  if (!project) return;
+
+  const income = getProjectPayment(projectName);
+  const incomeTxns = getProjectIncomeTransactions(projectName);
+  const expenses = getProjectExpenseTransactions(projectName);
+  const totalExpenses = expenses.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+  const net = income - totalExpenses;
+
+  const incomeEl = document.getElementById('project-finance-income');
+  const expenseEl = document.getElementById('project-finance-expenses');
+  const profitEl = document.getElementById('project-finance-profit');
+  const expenseCountEl = document.getElementById('project-finance-expense-count');
+  const profitSubEl = document.getElementById('project-finance-profit-sub');
+  const listEl = document.getElementById('project-finance-list');
+  const updatedEl = document.getElementById('project-finance-last-updated');
+  if (!incomeEl || !expenseEl || !profitEl || !expenseCountEl || !profitSubEl || !listEl || !updatedEl) return;
+
+  incomeEl.textContent = getProjectPaymentLabel(projectName);
+  expenseEl.textContent = fmt(totalExpenses);
+  profitEl.textContent = fmt(net);
+  profitEl.style.color = net > 0 ? 'var(--green)' : net < 0 ? 'var(--red)' : 'var(--text)';
+  expenseCountEl.textContent = `${expenses.length} linked expense entr${expenses.length === 1 ? 'y' : 'ies'}`;
+  profitSubEl.textContent = net > 0 ? 'Profitable so far' : net < 0 ? 'Costs are ahead right now' : 'Break-even';
+
+  const latestDate = [...incomeTxns.map(t => t.date), project.paymentDate, ...expenses.map(t => t.date)].filter(Boolean).sort().slice(-1)[0];
+  updatedEl.textContent = latestDate ? `Last money update: ${latestDate}` : 'No dated money entries yet';
+
+  const timelineEntries = [
+    ...incomeTxns.map(t => ({ ...t, entryType: 'income' })),
+    ...expenses.map(t => ({ ...t, entryType: 'expense' }))
+  ].sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || (b.id || 0) - (a.id || 0));
+
+  if (!timelineEntries.length) {
+    listEl.innerHTML = `<div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.6;">No money entries linked to ${projectName} yet. Add project income, expenses, or invoices in Finance.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = timelineEntries
+    .slice(0, 6)
+    .map(t => {
+      const isIncome = t.entryType === 'income';
+      const amountColor = isIncome ? 'var(--green)' : 'var(--red)';
+      const amountPrefix = isIncome ? '+' : '-';
+      const label = isIncome ? (t.paymentType === 'monthly' ? 'Income · Monthly' : 'Income') : (t.category || 'Expense');
+      return `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);">
+        <div style="min-width:0;">
+          <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.desc || (isIncome ? 'Income' : 'Expense')}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:3px;">${label}${t.date ? ` · ${t.date}` : ''}</div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:${amountColor};font-family:'DM Mono',monospace;flex-shrink:0;">${amountPrefix}${fmt(t.amount)}</div>
+      </div>`;
+    }).join('') + (timelineEntries.length > 6 ? `<div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:right;">+${timelineEntries.length - 6} more money entr${timelineEntries.length - 6 === 1 ? 'y' : 'ies'} in Finance</div>` : '');
+}
+
+function getDisplayTransactions() {
+  const manualTxns = (financeData.transactions || []).filter(Boolean).map(t => ({ ...t, amount: Number(t.amount) || 0 }));
+  const legacyProjectPayments = Object.entries(projects)
+    .filter(([name]) => getProjectIncomeTransactions(name).length === 0 && getProjectPayment(name) > 0)
+    .map(([projectName, p]) => ({
+      id: `payment-${projectName}`,
+      type: 'income',
+      project: projectName,
+      desc: getProjectPaymentMode(projectName) === 'monthly' ? 'Monthly client payment' : 'Client payment',
+      amount: getProjectPayment(projectName),
+      category: getProjectPaymentMode(projectName) === 'monthly' ? 'Monthly Project Payment' : 'Project Payment',
+      date: p.paymentDate || new Date().toISOString().split('T')[0],
+      synthetic: true,
+      paymentType: getProjectPaymentMode(projectName)
+    }));
+  return [...legacyProjectPayments, ...manualTxns];
+}
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ── THEME ──
+let currentTheme = _state.theme || 'dark';
+function applyTheme(t) {
+  currentTheme = t;
+  document.body.setAttribute('data-theme', t === 'light' ? 'light' : '');
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = t === 'light' ? '🌙' : '☀️';
+  saveState();
+}
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+applyTheme(currentTheme);
+
+// ── TASKBAR AUTO-HIDE ──
+let taskbarHideTimer;
+const taskbar = document.getElementById('taskbar');
+const trigger = document.getElementById('taskbar-trigger');
+
+trigger.addEventListener('mouseenter', () => {
+  clearTimeout(taskbarHideTimer);
+  taskbar.classList.remove('hidden');
+  document.getElementById('app').style.marginTop = '48px';
+  document.getElementById('app').style.height = 'calc(100vh - 48px)';
+});
+taskbar.addEventListener('mouseleave', () => {
+  taskbarHideTimer = setTimeout(() => {
+    taskbar.classList.add('hidden');
+    document.getElementById('app').style.marginTop = '0';
+    document.getElementById('app').style.height = '100vh';
+  }, 1500);
+});
+taskbar.addEventListener('mouseenter', () => {
+  clearTimeout(taskbarHideTimer);
+  document.getElementById('app').style.marginTop = '48px';
+  document.getElementById('app').style.height = 'calc(100vh - 48px)';
+});
+setTimeout(() => {
+  taskbar.classList.add('hidden');
+  document.getElementById('app').style.marginTop = '0';
+  document.getElementById('app').style.height = '100vh';
+}, 3000);
+
+// ── TABS ──
+let currentTab = 'overview';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.getAttribute('onclick') === `switchTab('${tab}')`) b.classList.add('active');
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+
+  // Sidebar only on overview
+  document.getElementById('sidebar').style.display = tab === 'overview' ? 'flex' : 'none';
+
+  if (tab === 'outreach') { renderSentLog(); populateReplyProjectSelect(); }
+  if (tab === 'pitches') renderPitchBlocks();
+  if (tab === 'calendar') { renderBigCal(); renderMeetingList(); }
+  if (tab === 'finance') renderFinance();
+  if (tab === 'summaries') renderSummaries();
+  if (tab === 'analytics') renderAnalytics();
+}
+
+function loadProject() {
+  const p = projects[activeProject];
+  document.getElementById('active-project-tag').textContent = activeProject;
+  // Fix: only update elements that still exist
+  const pitchTag = document.getElementById('pitches-project-tag');
+  if (pitchTag) pitchTag.textContent = activeProject;
+  const summTag = document.getElementById('summaries-project-tag');
+  if (summTag) summTag.textContent = activeProject;
+
+  // email
+  const replied = p.emailReplied;
+  document.getElementById('email-icon').textContent = replied ? '✓' : '✗';
+  document.getElementById('email-icon').className = 'status-icon ' + (replied ? 'replied' : 'no-reply');
+  document.getElementById('email-status-text').textContent = replied ? 'Client Replied' : 'No Reply Yet';
+
+  // interest
+  setInterestDisplay(p.interest);
+
+  // brief
+  document.getElementById('brief-text').textContent = p.brief;
+
+  // client meta
+  const metaName = document.getElementById('meta-client-name');
+  const metaEmail = document.getElementById('meta-client-email');
+  const metaBiz = document.getElementById('meta-biz-type');
+  const metaPaymentType = document.getElementById('meta-payment-type');
+  const metaPayment = document.getElementById('meta-client-payment');
+  if (metaName) metaName.value = p.clientName || '';
+  if (metaEmail) metaEmail.value = p.clientEmail || '';
+  if (metaBiz) metaBiz.value = p.bizType || '';
+  if (metaPaymentType) metaPaymentType.value = p.paymentMode === 'monthly' ? 'monthly' : 'one-time';
+  if (metaPayment) metaPayment.value = p.paymentMode === 'monthly' ? (Number(p.monthlyPayment) || 0) : (Number(p.payment) || 0);
+
+  // progress
+  updateProgress();
+
+  // todos
+  renderTodos();
+
+  stopWorkTimer(false);
+  updateWorkTimerUI();
+
+  // mini cal
+  renderMiniCal();
+  renderProjectFinanceOverview();
+}
+
+function saveProjectMeta() {
+  const p = projects[activeProject];
+  if (!p) return;
+  p.clientName = document.getElementById('meta-client-name')?.value.trim() || '';
+  p.clientEmail = document.getElementById('meta-client-email')?.value.trim() || '';
+  p.bizType = document.getElementById('meta-biz-type')?.value.trim() || '';
+  p.paymentMode = document.getElementById('meta-payment-type')?.value === 'monthly' ? 'monthly' : 'one-time';
+  const amount = Math.max(0, Number(document.getElementById('meta-client-payment')?.value) || 0);
+  if (p.paymentMode === 'monthly') {
+    p.monthlyPayment = amount;
+    p.payment = 0;
+  } else {
+    p.payment = amount;
+    p.monthlyPayment = 0;
+  }
+  p.paymentDate = new Date().toISOString().split('T')[0];
+  renderProjectFinanceOverview();
+  renderSummaries();
+  renderAnalytics();
+  renderFinance();
+  saveState();
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const todos = projects[activeProject].todos;
+  const done = todos.filter(t => t.done).length;
+  const total = todos.length;
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  projects[activeProject].progress = pct;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-task-count').textContent = total === 0 ? 'No tasks yet' : `${done} of ${total} tasks done`;
+}
+
+// ── TODOS ──
+function renderTodos() {
+  const list = document.getElementById('todo-list');
+  list.innerHTML = '';
+  const todos = projects[activeProject].todos;
+  todos.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'todo-item';
+    el.innerHTML = `
+      <div class="todo-check ${t.done ? 'done' : ''}" onclick="toggleTodo(${i})">${t.done ? '✓' : ''}</div>
+      <div class="todo-text ${t.done ? 'done' : ''}">${t.text}</div>
+      <button class="todo-del" onclick="deleteTodo(${i})">×</button>
+    `;
+    list.appendChild(el);
+  });
+  updateProgress();
+}
+
+function toggleTodo(i) {
+  projects[activeProject].todos[i].done = !projects[activeProject].todos[i].done;
+  renderTodos();
+  saveState();
+}
+
+function deleteTodo(i) {
+  projects[activeProject].todos.splice(i, 1);
+  renderTodos();
+  saveState();
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-input');
+  const text = input.value.trim();
+  if (!text) return;
+  projects[activeProject].todos.push({text, done: false});
+  input.value = '';
+  renderTodos();
+  saveState();
+}
+
+// ── STATUS MODAL ──
+function openStatusModal() { document.getElementById('status-modal').classList.add('open'); }
+function closeModal() { document.getElementById('status-modal').classList.remove('open'); }
+
+function setEmailStatus(s) {
+  projects[activeProject].emailReplied = s === 'replied';
+  const logEntry = sentLog.find(e => e.project === activeProject);
+  if (logEntry) logEntry.replied = (s === 'replied');
+  loadProject();
+  if (currentTab === 'analytics') renderAnalytics();
+  closeModal();
+  saveState();
+}
+
+function setInterest(s) {
+  projects[activeProject].interest = s;
+  setInterestDisplay(s);
+  if (currentTab === 'analytics') renderAnalytics();
+  if (currentTab === 'summaries') renderSummaries();
+  closeModal();
+  saveState();
+}
+
+function setInterestDisplay(s) {
+  const badge = document.getElementById('interest-badge');
+  const classes = { interested: 'interested', pending: 'pending', 'not-interested': 'not-interested' };
+  const labels = { interested: '● Interested', pending: '● Pending', 'not-interested': '● Not Interested' };
+  badge.className = 'interest-badge ' + (classes[s] || 'pending');
+  badge.textContent = labels[s] || '● Pending';
+}
+
+// ── MINI SCHEDULER ──
+let miniSchedDateStr = '';
+function openMiniScheduler(dateStr) {
+  miniSchedDateStr = dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  document.getElementById('mini-sched-date').textContent = d.toLocaleDateString('en-ZA', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('mini-sched-title').value = '';
+  document.getElementById('mini-sched-project').value = activeProject;
+  document.getElementById('mini-sched-time').value = '';
+  document.getElementById('mini-sched-notes').value = '';
+  document.getElementById('mini-scheduler-modal').classList.add('open');
+}
+
+function saveMiniMeeting() {
+  const title = document.getElementById('mini-sched-title').value.trim() || 'Meeting';
+  const project = document.getElementById('mini-sched-project').value.trim() || activeProject;
+  const time = document.getElementById('mini-sched-time').value || '00:00';
+  const notes = document.getElementById('mini-sched-notes').value.trim();
+  projects[activeProject].meetings = projects[activeProject].meetings || [];
+  projects[activeProject].meetings.push({
+    id: Date.now(),
+    title,
+    project,
+    date: miniSchedDateStr,
+    time,
+    notes
+  });
+  document.getElementById('mini-scheduler-modal').classList.remove('open');
+  renderMiniCal();
+  saveState();
+}
+
+// ── MINI CALENDAR ──
+function renderMiniCal() {
+  const cal = document.getElementById('mini-cal');
+  // Clear day cells only (keep headers)
+  while (cal.children.length > 7) cal.removeChild(cal.lastChild);
+
+  const y = miniCalDate.getFullYear();
+  const m = miniCalDate.getMonth();
+  document.getElementById('mini-cal-month').textContent = miniCalDate.toLocaleString('default', {month:'long', year:'numeric'});
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+  const meetings = (projects[activeProject]?.meetings || []).map(mt => parseInt(mt.date.split('-')[2]));
+
+  for (let i = 0; i < firstDay; i++) {
+    const d = document.createElement('div');
+    d.className = 'cal-day empty';
+    cal.appendChild(d);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    const isToday = d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
+    const hasMeet = meetings.includes(d);
+    el.className = 'cal-day' + (isToday ? ' today' : '') + (hasMeet && !isToday ? ' has-meeting' : '');
+    el.textContent = d;
+    const _d = d, _y = y, _m = m;
+    el.onclick = () => {
+      const dateStr = `${_y}-${String(_m+1).padStart(2,'0')}-${String(_d).padStart(2,'0')}`;
+      openMiniScheduler(dateStr);
+    };
+    cal.appendChild(el);
+  }
+}
+
+function changeMonth(dir) {
+  miniCalDate.setMonth(miniCalDate.getMonth() + dir);
+  renderMiniCal();
+}
+
+// ── BIG CALENDAR ──
+function renderBigCal() {
+  const cal = document.getElementById('big-cal');
+  cal.innerHTML = '';
+  const y = bigCalDate.getFullYear();
+  const m = bigCalDate.getMonth();
+  document.getElementById('big-cal-month').textContent = bigCalDate.toLocaleString('default', {month:'long', year:'numeric'});
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+
+  const allMeetings = [];
+  Object.entries(projects).forEach(([pKey, p]) => (p.meetings || []).forEach(mt => allMeetings.push({...mt, _pKey: pKey})));
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'big-cal-day empty';
+    cal.appendChild(el);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    const isToday = d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
+    el.className = 'big-cal-day' + (isToday ? ' today' : '');
+    const numEl = document.createElement('div');
+    numEl.className = 'big-day-num' + (isToday ? ' today-num' : '');
+    numEl.textContent = d;
+    el.appendChild(numEl);
+
+    const dayStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    allMeetings.filter(mt => mt.date === dayStr).forEach(mt => {
+      const pill = document.createElement('div');
+      pill.className = 'big-meeting-pill';
+      pill.title = `${mt.title || mt.project} — click to delete`;
+      pill.style.cursor = 'pointer';
+      pill.textContent = mt.title || mt.project;
+      pill.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete "${mt.title || mt.project}"?`)) {
+          deleteMeeting(mt._pKey, mt.id);
+        }
+      };
+      pill.onmouseover = () => pill.style.opacity = '0.6';
+      pill.onmouseout = () => pill.style.opacity = '1';
+      el.appendChild(pill);
+    });
+    cal.appendChild(el);
+  }
+}
+
+function changeBigMonth(dir) {
+  bigCalDate.setMonth(bigCalDate.getMonth() + dir);
+  renderBigCal();
+}
+
+function renderMeetingList() {
+  const list = document.getElementById('meeting-list');
+  list.innerHTML = '';
+  const allMeetings = [];
+  Object.entries(projects).forEach(([pKey, p]) => (p.meetings || []).forEach(mt => allMeetings.push({...mt, _pKey: pKey})));
+  allMeetings.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+  if (!allMeetings.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-family:\'DM Mono\',monospace">No events scheduled.</div>';
+    return;
+  }
+  allMeetings.forEach(mt => {
+    const el = document.createElement('div');
+    el.className = 'meeting-item';
+    el.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:8px;';
+    el.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div class="meeting-title">${mt.title || mt.project}</div>
+        <div class="meeting-meta">${mt.project ? mt.project + ' · ' : ''}${formatDate(mt.date)} · ${mt.time}${mt.notes ? ' — ' + mt.notes : ''}</div>
+      </div>
+      <button onclick="deleteMeeting('${mt._pKey}', ${mt.id})" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 2px;flex-shrink:0;opacity:0.5;line-height:1;" onmouseover="this.style.opacity=1;this.style.color='var(--red)'" onmouseout="this.style.opacity=0.5;this.style.color='var(--text-muted)'">×</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function deleteMeeting(projectKey, meetingId) {
+  if (!projects[projectKey]) return;
+  projects[projectKey].meetings = (projects[projectKey].meetings || []).filter(m => m.id !== meetingId);
+  renderMeetingList();
+  renderBigCal();
+  renderMiniCal();
+  saveState();
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-ZA', {day:'numeric', month:'short', year:'numeric'});
+}
+
+function addMeeting() {
+  const title = document.getElementById('meeting-title').value.trim() || 'Meeting';
+  const proj = document.getElementById('meeting-project').value.trim() || activeProject;
+  const date = document.getElementById('meeting-date').value;
+  const time = document.getElementById('meeting-time').value || '00:00';
+  const notes = document.getElementById('meeting-notes').value.trim();
+  if (!date) return alert('Please pick a date.');
+  projects[activeProject].meetings = projects[activeProject].meetings || [];
+  projects[activeProject].meetings.push({ id: Date.now(), title, project: proj, date, time, notes });
+  document.getElementById('meeting-title').value = '';
+  document.getElementById('meeting-project').value = '';
+  document.getElementById('meeting-date').value = '';
+  document.getElementById('meeting-time').value = '';
+  document.getElementById('meeting-notes').value = '';
+  renderBigCal();
+  renderMeetingList();
+  renderMiniCal();
+  saveState();
+}
+
+// ── OUTREACH ──
+function renderOutreach() {
+  const grid = document.getElementById('outreach-grid');
+  grid.innerHTML = '';
+  Object.entries(projects).forEach(([key, p]) => {
+    const statusMap = { interested: {cls:'interested', label:'Interested'}, 'not-interested': {cls:'not-interested', label:'Not Interested'}, pending: {cls:'pending', label:'Pending'} };
+    const s = statusMap[p.interest] || statusMap.pending;
+    const el = document.createElement('div');
+    el.className = 'outreach-card';
+    el.style.setProperty('--accent', p.color);
+    el.innerHTML = `
+      <div class="oc-project" style="color:${p.color}">${key}</div>
+      <div class="oc-name">${key} Client</div>
+      <div class="oc-brief">${p.brief.substring(0,80)}${p.brief.length>80?'…':''}</div>
+      <div class="oc-footer">
+        <div class="interest-badge ${s.cls}">● ${s.label}</div>
+        <span class="oc-link" onclick="goToProject('${key}')">View Overview →</span>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+// ── SIDEBAR ──
+function renderSidebar() {
+  const list = document.getElementById('project-list');
+  list.innerHTML = '';
+  Object.entries(projects).forEach(([key, p]) => {
+    const btn = document.createElement('button');
+    btn.className = 'project-btn' + (key === activeProject ? ' active' : '');
+    btn.dataset.key = key;
+    btn.innerHTML = `<div class="p-dot" style="background:${p.color}"></div><span class="p-label">${key}</span><div style="display:flex;gap:3px;flex-shrink:0;"><span class="p-edit" title="Rename">✎</span><span class="p-del" title="Delete">✕</span></div>`;
+    btn.onclick = (e) => {
+      if (e.target.classList.contains('p-edit') || e.target.classList.contains('p-del')) return;
+      selectProject(key);
+    };
+    btn.querySelector('.p-edit').onclick = (e) => {
+      e.stopPropagation();
+      startRename(key);
+    };
+    btn.querySelector('.p-del').onclick = (e) => {
+      e.stopPropagation();
+      deleteProject(key);
+    };
+    list.appendChild(btn);
+  });
+}
+
+function deleteProject(key) {
+  if (Object.keys(projects).length <= 1) { alert("You can't delete your last project."); return; }
+  if (!confirm(`Delete "${key}"? This cannot be undone.`)) return;
+  delete projects[key];
+  for (let i = sentLog.length - 1; i >= 0; i--) {
+    if (sentLog[i].project === key) sentLog.splice(i, 1);
+  }
+  (financeData.transactions || []).forEach(t => { if (t.project === key) t.project = null; });
+  (financeData.invoices || []).forEach(i => { if (i.project === key) i.project = 'Unassigned'; });
+  if (activeProject === key) activeProject = Object.keys(projects)[0];
+  renderSidebar();
+  loadProject();
+  if (currentTab === 'finance') renderFinance();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+function startRename(oldKey) {
+  document.getElementById('rename-modal').classList.add('open');
+  const input = document.getElementById('rename-input');
+  input.value = oldKey;
+  input.focus();
+  input.select();
+  input.onkeydown = e => {
+    if (e.key === 'Enter') commitRename(oldKey);
+    if (e.key === 'Escape') document.getElementById('rename-modal').classList.remove('open');
+  };
+  document.getElementById('rename-confirm').onclick = () => commitRename(oldKey);
+}
+
+function commitRename(oldKey) {
+  const newKey = document.getElementById('rename-input').value.trim();
+  document.getElementById('rename-modal').classList.remove('open');
+  if (!newKey || newKey === oldKey) return;
+  if (projects[newKey]) { alert('A project with that name already exists.'); return; }
+  projects[newKey] = projects[oldKey];
+  delete projects[oldKey];
+  sentLog.forEach(e => { if (e.project === oldKey) e.project = newKey; });
+  (financeData.transactions || []).forEach(t => { if (t.project === oldKey) t.project = newKey; });
+  (financeData.invoices || []).forEach(i => { if (i.project === oldKey) i.project = newKey; });
+  if (activeProject === oldKey) activeProject = newKey;
+  renderSidebar();
+  loadProject();
+  if (currentTab === 'finance') renderFinance();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+function selectProject(name) {
+  activeProject = name;
+  renderSidebar();
+  loadProject();
+  saveState();
+}
+
+// ── ADD PROJECT ──
+function addProject() {
+  const name = prompt('Project name (e.g. P6):');
+  if (!name || projects[name]) return;
+  const colors = ['#f07070','#70f0c0','#f0c070','#70a0f0','#f070c0'];
+  const color = colors[Object.keys(projects).length % colors.length];
+  projects[name] = { color, clientName: '', clientEmail: '', bizType: '', payment: 0, monthlyPayment: 0, paymentMode: 'one-time', timeSpentSeconds: 0, emailReplied: false, interest: 'pending', brief: 'No brief yet.', progress: 0, todos: [], meetings: [] };
+  activeProject = name;
+  renderSidebar();
+  loadProject();
+  saveState();
+}
+
+function goToProject(name) {
+  if (!name) return;
+  // If the project doesn't exist, just switch to overview with current project
+  if (!projects[name]) {
+    switchTab('overview');
+    return;
+  }
+  activeProject = name;
+  saveState();
+  switchTab('overview');
+  renderSidebar();
+  loadProject();
+}
+
+// ── AI PROVIDER SETTINGS ──
+let aiProvider = _state.aiProvider || 'claude';
+let apiKeyClaude = _state.apiKeyC || '';
+let apiKeyOpenAI = _state.apiKeyO || '';
+
+function toggleApiSettings() {
+  const panel = document.getElementById('api-settings-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  if (panel.style.display === 'block') {
+    document.getElementById('api-key-claude').value = apiKeyClaude;
+    document.getElementById('api-key-openai').value = apiKeyOpenAI;
+    setProvider(aiProvider, false);
+  }
+}
+
+function setProvider(p, save = true) {
+  aiProvider = p;
+  const cBtn = document.getElementById('provider-claude');
+  const oBtn = document.getElementById('provider-openai');
+  const accent = 'var(--accent)';
+  cBtn.style.border = p === 'claude' ? `2px solid ${accent}` : '1px solid var(--border)';
+  cBtn.style.background = p === 'claude' ? 'rgba(232,213,160,0.06)' : 'transparent';
+  oBtn.style.border = p === 'openai' ? `2px solid ${accent}` : '1px solid var(--border)';
+  oBtn.style.background = p === 'openai' ? 'rgba(232,213,160,0.06)' : 'transparent';
+  document.getElementById('api-key-claude-group').style.display = p === 'claude' ? 'block' : 'none';
+  document.getElementById('api-key-openai-group').style.display = p === 'openai' ? 'block' : 'none';
+  if (save) saveApiSettings();
+}
+
+function saveApiSettings() {
+  apiKeyClaude = document.getElementById('api-key-claude').value.trim();
+  apiKeyOpenAI = document.getElementById('api-key-openai').value.trim();
+  saveState();
+  document.getElementById('api-settings-panel').style.display = 'none';
+  // Update ⚙ AI button to show active provider
+  document.getElementById('api-settings-btn').textContent = `⚙ ${aiProvider === 'openai' ? 'GPT-5' : 'Claude'}`;
+}
+
+// ── AI HELPERS ──
+async function callClaude(systemPrompt, userPrompt) {
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+  if (aiProvider === 'openai') {
+    const key = apiKeyOpenAI;
+    if (!key) throw new Error('No OpenAI API key set. Click ⚙ AI in the top bar.');
+    const url = isLocal ? '/api/openai' : 'https://api.openai.com/v1/chat/completions';
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-5-nano',
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices?.[0]?.message?.content || 'No response.';
+  }
+
+  // Default: Claude
+  const key = apiKeyClaude;
+  if (!key) throw new Error('No Anthropic API key set. Click ⚙ AI in the top bar.');
+  const url = isLocal ? '/api/claude' : 'https://api.anthropic.com/v1/messages';
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'API error');
+  return data.content?.[0]?.text || 'Error generating response.';
+}
+
+// ── PITCHES ──
+let activePitchKey = null;
+
+const DEFAULT_PITCH_BLOCKS = [
+  {
+    key: 'coffee-shop', icon: '☕', color: '#c47a3a', bg: 'rgba(196,122,58,0.1)',
+    label: 'Coffee Shop', tag: 'Hospitality · Local',
+    hook: 'Turn browsers into regulars with a site as warm as your space.',
+    subject: 'Your coffee shop deserves a website that works as hard as you do',
+    body: `Hi {name},\n\nI came across your coffee shop and love what you're building — but I noticed your online presence doesn't quite match the quality of what you serve.\n\nWe build websites for independent coffee shops that turn browsers into regulars: online menus, loyalty sign-ups, event listings, and the kind of design that feels as warm as your space.\n\nMost of our coffee shop sites go live in under 3 weeks and start paying for themselves fast.\n\nWorth a quick chat? I'd love to show you a few examples.\n\nThe Web Team`,
+    custom: false
+  },
+  {
+    key: 'butchery', icon: '🥩', color: '#c43a3a', bg: 'rgba(196,58,58,0.1)',
+    label: 'Butchery', tag: 'Retail · Food',
+    hook: 'Show up when people search for meat near them — and take orders online.',
+    subject: 'More customers, less foot traffic dependency — for your butchery',
+    body: `Hi {name},\n\nRunning a butchery means your reputation is everything — but if people can't find you online, you're leaving real money on the table.\n\nWe build clean, professional websites for butcheries: weekly specials, cut lists, click-and-collect, and local SEO so you show up when people search for meat near them.\n\nWe've helped butcheries grow their order volume without spending a cent on ads — just a website that works.\n\nCan I send over a quick example? Takes 2 minutes to look at.\n\nThe Web Team`,
+    custom: false
+  },
+  {
+    key: 'tailor', icon: '🧵', color: '#7a5bc4', bg: 'rgba(122,91,196,0.1)',
+    label: 'Tailor', tag: 'Bespoke · Craft',
+    hook: 'A website as sharp as your craftsmanship — so clients find you first.',
+    subject: 'A website as sharp as your craftsmanship',
+    body: `Hi {name},\n\nYour tailoring speaks for itself — but without a strong online presence, you're relying on word-of-mouth alone.\n\nWe build elegant, portfolio-style websites for tailors and bespoke clothing makers: showcasing your work, booking consultations, and telling the story behind your craft.\n\nClients who find you online are already sold on custom — they just need to find you first.\n\nWould you be open to a quick 15-minute call to see what we have in mind?\n\nThe Web Team`,
+    custom: false
+  },
+  {
+    key: 'clothing-brand', icon: '👗', color: '#3a8fc4', bg: 'rgba(58,143,196,0.1)',
+    label: 'Clothing Brand', tag: 'Fashion · eCommerce',
+    hook: 'A store that converts visitors into customers — and sells while you sleep.',
+    subject: 'Your clothing brand needs a website that sells while you sleep',
+    body: `Hi {name},\n\nYour brand has the look — but is your website converting visitors into customers?\n\nWe build high-converting online stores for independent clothing brands: fast, mobile-first, with product pages and checkout flows designed to reduce abandoned carts and increase average order value.\n\nWe've launched stores for brands just like yours and seen sales jump within the first month.\n\nLet's talk — I'd love to show you what's possible.\n\nThe Web Team`,
+    custom: false
+  }
+];
+
+// Merge saved custom pitches with defaults
+let customPitches = _state.customPitches || [];
+function getPitchBlocks() {
+  return [...DEFAULT_PITCH_BLOCKS, ...customPitches];
+}
+
+function renderPitchBlocks() {
+  const grid = document.getElementById('pitch-blocks-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  getPitchBlocks().forEach(p => {
+    const bg = p.bg || hexToRgba(p.color, 0.1);
+    const el = document.createElement('div');
+    el.className = 'card pitch-block';
+    el.style.cssText = `cursor:pointer;border-color:${p.color}22;transition:all 0.2s;position:relative;overflow:hidden;`;
+    el.innerHTML = `
+      <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:${bg};border-radius:0 10px 0 80px;pointer-events:none;"></div>
+      ${p.custom ? `<div style="position:absolute;top:10px;right:10px;font-size:9px;font-family:'DM Mono',monospace;color:${p.color};background:${bg};border:1px solid ${p.color}44;border-radius:4px;padding:1px 5px;letter-spacing:0.06em;">CUSTOM</div>` : ''}
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:${bg};border:1px solid ${p.color}33;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${p.icon || '📝'}</div>
+        <div>
+          <div style="font-size:15px;font-weight:800;margin-bottom:2px;">${p.label}</div>
+          <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);letter-spacing:0.06em;">${p.tag}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:14px;">${p.hook}</div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">"${p.subject}"</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+        <span style="font-size:11px;color:${p.color};font-weight:700;letter-spacing:0.04em;">View pitch →</span>
+      </div>
+    `;
+    el.onmouseenter = () => { el.style.borderColor = p.color; el.style.transform = 'translateY(-2px)'; };
+    el.onmouseleave = () => { el.style.borderColor = `${p.color}22`; el.style.transform = ''; };
+    el.onclick = () => openPitchModal(p.key);
+    grid.appendChild(el);
+  });
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function openPitchModal(key) {
+  const p = getPitchBlocks().find(x => x.key === key);
+  if (!p) return;
+  activePitchKey = key;
+  const bg = p.bg || hexToRgba(p.color, 0.1);
+  document.getElementById('pitch-modal-icon').textContent = p.icon || '📝';
+  document.getElementById('pitch-modal-icon').style.background = bg;
+  document.getElementById('pitch-modal-title').textContent = p.label;
+  document.getElementById('pitch-modal-tag').textContent = p.tag;
+  document.getElementById('pitch-modal-body').textContent = p.body.replace('{name}', 'there');
+  // Only show delete for custom pitches
+  document.getElementById('pitch-modal-delete-btn').style.display = p.custom ? 'block' : 'none';
+  document.getElementById('pitch-modal').classList.add('open');
+}
+
+function copyActivePitch() {
+  const p = getPitchBlocks().find(x => x.key === activePitchKey);
+  if (!p) return;
+  navigator.clipboard.writeText(p.body.replace('{name}', 'there'));
+  const btn = document.getElementById('pitch-modal-copy-btn');
+  const orig = btn.textContent; btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = orig, 1500);
+}
+
+function deleteActivePitch() {
+  if (!confirm('Delete this pitch?')) return;
+  customPitches = customPitches.filter(p => p.key !== activePitchKey);
+  document.getElementById('pitch-modal').classList.remove('open');
+  renderPitchBlocks();
+  saveState();
+}
+
+function usePitchForOutreach() {
+  const p = getPitchBlocks().find(x => x.key === activePitchKey);
+  if (!p) return;
+  document.getElementById('pitch-modal').classList.remove('open');
+  document.getElementById('outreach-biz').value = p.label;
+  switchTab('outreach');
+}
+
+function openNewPitchModal() {
+  document.getElementById('new-pitch-label').value = '';
+  document.getElementById('new-pitch-tag').value = '';
+  document.getElementById('new-pitch-hook').value = '';
+  document.getElementById('new-pitch-subject').value = '';
+  document.getElementById('new-pitch-body').value = '';
+  document.getElementById('new-pitch-icon').value = '📝';
+  document.getElementById('new-pitch-color').value = '#f0a800';
+  document.getElementById('new-pitch-ai-status').style.display = 'none';
+  document.getElementById('new-pitch-modal').classList.add('open');
+}
+
+function saveNewPitch() {
+  const label = document.getElementById('new-pitch-label').value.trim();
+  const tag = document.getElementById('new-pitch-tag').value.trim();
+  const hook = document.getElementById('new-pitch-hook').value.trim();
+  const subject = document.getElementById('new-pitch-subject').value.trim();
+  const body = document.getElementById('new-pitch-body').value.trim();
+  const icon = document.getElementById('new-pitch-icon').value.trim() || '📝';
+  const color = document.getElementById('new-pitch-color').value;
+  if (!label || !body) { alert('Please fill in at least a business type and pitch body.'); return; }
+  const key = 'custom-' + Date.now();
+  customPitches.push({ key, icon, color, bg: hexToRgba(color, 0.1), label, tag: tag || 'Custom', hook: hook || label, subject: subject || `A website for your ${label}`, body, custom: true });
+  document.getElementById('new-pitch-modal').classList.remove('open');
+  renderPitchBlocks();
+  saveState();
+}
+
+async function generatePitchWithAI() {
+  const label = document.getElementById('new-pitch-label').value.trim();
+  if (!label) { alert('Enter a business type first so the AI knows what to write.'); return; }
+  const status = document.getElementById('new-pitch-ai-status');
+  status.style.display = 'block';
+  status.textContent = 'Writing pitch with AI...';
+  try {
+    const system = `You are a sales copywriter for a web design agency. Output ONLY valid JSON with these fields: subject (string), hook (one short sentence), body (full pitch under 120 words, use {name} for client name, sign off as "The Web Team"), tag (short niche tag like "Retail · Local"). No markdown.`;
+    const text = await callClaude(system, `Write a cold outreach pitch for a ${label} business.`);
+    const data = JSON.parse(text.replace(/```json|```/g,'').trim());
+    if (data.subject) document.getElementById('new-pitch-subject').value = data.subject;
+    if (data.hook) document.getElementById('new-pitch-hook').value = data.hook;
+    if (data.body) document.getElementById('new-pitch-body').value = data.body;
+    if (data.tag) document.getElementById('new-pitch-tag').value = data.tag;
+    status.textContent = '✓ Generated — review and save.';
+  } catch(e) {
+    status.textContent = 'AI failed: ' + e.message;
+  }
+}
+
+function renderSavedPitches() { renderPitchBlocks(); }
+
+function selectTone(el) {
+  document.querySelectorAll('.tone-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── GMAIL SETUP (simple — no OAuth) ──
+function saveGmailSetup() {
+  const addr = document.getElementById('gmail-address').value.trim();
+  if (!addr) { alert('Please enter your Gmail address.'); return; }
+  gmailUser = addr;
+  document.getElementById('outreach-setup').style.display = 'none';
+  document.getElementById('outreach-composer').style.display = 'flex';
+  document.getElementById('outreach-from-label').textContent = addr;
+  populateReplyProjectSelect();
+  saveState();
+}
+
+function resetGmailSetup() {
+  gmailUser = '';
+  gmailClientId = '';
+  document.getElementById('outreach-setup').style.display = 'flex';
+  document.getElementById('outreach-composer').style.display = 'none';
+  saveState();
+}
+
+function populateReplyProjectSelect() {
+  const sel = document.getElementById('reply-project-select');
+  if (!sel) return;
+  sel.innerHTML = Object.keys(projects).map(k => `<option value="${k}">${k}</option>`).join('');
+}
+
+async function submitInlineReply() {
+  const projectName = document.getElementById('reply-project-select').value;
+  const replyText = document.getElementById('reply-textarea-inline').value.trim();
+  const btn = document.getElementById('reply-submit-inline-btn');
+  const status = document.getElementById('reply-inline-status');
+
+  if (!projectName) { status.style.color = 'var(--red)'; status.textContent = 'Select a project first.'; return; }
+  if (!replyText) { status.style.color = 'var(--red)'; status.textContent = 'Please paste a reply first.'; return; }
+
+  const p = projects[projectName];
+  if (!p) { status.style.color = 'var(--red)'; status.textContent = 'Project not found.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Analysing...';
+  status.style.color = 'var(--text-muted)';
+  status.textContent = 'Reading reply with AI...';
+
+  // Immediately mark as replied so it's saved even if AI fails
+  p.emailReplied = true;
+  p.todos = p.todos.map(t => t.text.toLowerCase().includes('wait') ? {...t, done: true} : t);
+  const logEntry = sentLog.find(e => e.project === projectName);
+  if (logEntry) logEntry.replied = true;
+
+  try {
+    const system = `You are a CRM assistant. Analyse a client email reply. Respond ONLY with valid JSON, no markdown, no extra text:
+{"interest":"interested"|"not-interested"|"pending","brief":"one sentence: what the client wants, or Pending if unclear","replySummary":"one sentence summary of their reply tone and intent"}`;
+    const raw = await callClaude(system, `Client reply:\n\n${replyText.substring(0, 1200)}`);
+
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { parsed = null; }
+
+    if (parsed) {
+      p.interest = parsed.interest || 'pending';
+      p.brief = parsed.brief || 'Pending — no details provided.';
+      p.todos.push({ text: `Reply: ${parsed.replySummary || 'See notes'}`, done: false });
+      status.style.color = 'var(--green)';
+      status.textContent = `✓ "${projectName}" updated — ${parsed.interest}`;
+    } else {
+      p.interest = 'pending';
+      p.brief = replyText.substring(0, 150);
+      status.style.color = 'var(--pending)';
+      status.textContent = `✓ Saved — AI couldn't parse, brief set to reply text`;
+    }
+  } catch(e) {
+    // AI unavailable — still save the reply as received
+    p.interest = 'pending';
+    p.brief = replyText.substring(0, 150);
+    status.style.color = 'var(--pending)';
+    status.textContent = `✓ Saved (AI offline: ${e.message})`;
+  } finally {
+    if (activeProject === projectName) loadProject();
+    renderSidebar();
+    renderSentLog();
+    saveState();
+    document.getElementById('reply-textarea-inline').value = '';
+    btn.disabled = false;
+    btn.textContent = '✦ Analyse & Update Project';
+  }
+}
+
+// ── GENERIC PITCH TEMPLATES ──
+const pitchTemplates = {
+  'coffee shop': {
+    subject: 'Your coffee shop deserves a website that works as hard as you do',
+    body: `Hi {name},
+
+I came across your coffee shop and love what you're building — but I noticed your online presence doesn't quite match the quality of what you serve.
+
+We build websites for independent coffee shops that turn browsers into regulars: online menus, loyalty sign-ups, event listings, and the kind of design that feels as warm as your space.
+
+Most of our coffee shop sites go live in under 3 weeks and start paying for themselves fast.
+
+Worth a quick chat? I'd love to show you a few examples.
+
+The Web Team`
+  },
+  'butchery': {
+    subject: 'More customers, less foot traffic dependency — for your butchery',
+    body: `Hi {name},
+
+Running a butchery means your reputation is everything — but if people can't find you online, you're leaving real money on the table.
+
+We build clean, professional websites for butcheries: weekly specials, cut lists, click-and-collect, and local SEO so you show up when people search for meat near them.
+
+We've helped butcheries grow their order volume without spending a cent on ads — just a website that works.
+
+Can I send over a quick example? Takes 2 minutes to look at.
+
+The Web Team`
+  },
+  'tailor': {
+    subject: 'A website as sharp as your craftsmanship',
+    body: `Hi {name},
+
+Your tailoring speaks for itself — but without a strong online presence, you're relying on word-of-mouth alone.
+
+We build elegant, portfolio-style websites for tailors and bespoke clothing makers: showcasing your work, booking consultations, and telling the story behind your craft.
+
+Clients who find you online are already sold on custom — they just need to find you first.
+
+Would you be open to a quick 15-minute call to see what we have in mind?
+
+The Web Team`
+  },
+  'clothing brand': {
+    subject: 'Your clothing brand needs a website that sells while you sleep',
+    body: `Hi {name},
+
+Your brand has the look — but is your website converting visitors into customers?
+
+We build high-converting online stores for independent clothing brands: fast, mobile-first, with product pages and checkout flows designed to reduce abandoned carts and increase average order value.
+
+We've launched stores for brands just like yours and seen sales jump within the first month.
+
+Let's talk — I'd love to show you what's possible.
+
+The Web Team`
+  }
+};
+
+function getTemplateForBiz(bizType) {
+  const lower = bizType.toLowerCase();
+  // Check custom pitches first
+  const custom = customPitches.find(p => p.label.toLowerCase().includes(lower) || lower.includes(p.label.toLowerCase()));
+  if (custom) return { subject: custom.subject, body: custom.body };
+  // Then check built-in templates
+  for (const [key, tpl] of Object.entries(pitchTemplates)) {
+    if (lower.includes(key) || key.includes(lower)) return tpl;
+  }
+  return null;
+}
+
+// ── SEND OUTREACH ──
+async function sendOutreach() {
+  const clientName = document.getElementById('outreach-client-name').value.trim();
+  const email = document.getElementById('outreach-email').value.trim();
+  const biz = document.getElementById('outreach-biz').value.trim();
+  const tone = document.querySelector('.tone-opt.active')?.dataset.val || 'professional';
+
+  if (!email || !biz) { alert('Please fill in client email and business type.'); return; }
+
+  setOutreachState('sending');
+  setStatusMsg('Writing email...');
+
+  let subject, body;
+  try {
+    const template = getTemplateForBiz(biz);
+    if (template) {
+      subject = template.subject;
+      body = template.body.replace('{name}', clientName || 'there');
+    } else {
+      setStatusMsg('Writing email with AI...');
+      const system = `You are a cold outreach specialist for a web design agency. Output ONLY in this exact format with no extra text:
+SUBJECT: [subject line]
+---
+[email body, under 120 words, end with a clear call to action, sign off as "The Web Team"]`;
+      const prompt = `Write a cold outreach email to ${clientName || 'the business owner'} at a ${biz} business. Tone: ${tone}. First contact.`;
+      const text = await callClaude(system, prompt);
+      const subjectMatch = text.match(/SUBJECT:\s*(.+)/);
+      const parts = text.split(/---/);
+      subject = subjectMatch ? subjectMatch[1].trim() : `Web design for your ${biz}`;
+      body = parts[1] ? parts[1].trim() : text;
+    }
+  } catch(e) {
+    setOutreachState('error');
+    document.getElementById('outreach-error-msg').textContent = 'AI failed: ' + e.message;
+    return;
+  }
+
+  setStatusMsg('Opening Gmail...');
+  try {
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&authuser=${encodeURIComponent(gmailUser)}`;
+    window.open(gmailUrl, '_blank');
+
+    // Auto-create project with all fields set to pending defaults
+    setStatusMsg('Creating project...');
+    const colors = ['#f0a500','#5b8ef0','#3ecf6a','#e85454','#b06ef0','#f07070','#70f0c0','#f0c070'];
+    let finalName = clientName || biz || `Client ${Object.keys(projects).length + 1}`;
+    let counter = 2;
+    while (projects[finalName]) { finalName = `${finalName.replace(/ \d+$/, '')} ${counter++}`; }
+    const color = colors[Object.keys(projects).length % colors.length];
+
+    projects[finalName] = {
+      color,
+      clientEmail: email,
+      clientName: clientName || '',
+      bizType: biz,
+      emailReplied: false,
+      interest: 'pending',
+      brief: 'Pending — no reply yet.',
+      progress: 0,
+      todos: [
+        { text: `Follow up with ${clientName || email}`, done: false },
+        { text: 'Waiting for reply', done: false }
+      ],
+      meetings: []
+    };
+
+    sentLog.unshift({ email, subject, project: finalName, date: new Date().toLocaleDateString(), replied: false });
+    renderSentLog();
+    renderSidebar();
+    saveState();
+
+    setOutreachState('done');
+    document.getElementById('outreach-done-detail').textContent = `Gmail opened for ${email} · Project "${finalName}" created with pending status`;
+    document.getElementById('outreach-view-project-btn').onclick = () => goToProject(finalName);
+
+    document.getElementById('outreach-client-name').value = '';
+    document.getElementById('outreach-email').value = '';
+    document.getElementById('outreach-biz').value = '';
+
+  } catch(e) {
+    setOutreachState('error');
+    document.getElementById('outreach-error-msg').textContent = e.message;
+  }
+}
+
+// ── LOG REPLY & AI PARSE ──
+let replyTargetProject = null;
+
+function openReplyModal(projectName) {
+  replyTargetProject = projectName;
+  document.getElementById('reply-project-label').textContent = projectName;
+  document.getElementById('reply-textarea').value = '';
+  document.getElementById('reply-modal').classList.add('open');
+}
+
+async function submitReply() {
+  const replyText = document.getElementById('reply-textarea').value.trim();
+  if (!replyText) { alert('Please paste the reply text.'); return; }
+
+  const btn = document.getElementById('reply-submit-btn');
+  btn.textContent = 'Analysing...';
+  btn.disabled = true;
+
+  try {
+    const system = `You are a CRM assistant. Analyse a client's email reply and extract structured info. Respond ONLY with valid JSON, no markdown, no explanation:
+{
+  "interest": "interested" | "not-interested" | "pending",
+  "brief": "one sentence summary of what the client wants, or 'Pending — unclear from reply' if not stated",
+  "replySummary": "one sentence summary of their reply tone and content"
+}`;
+    const prompt = `Client reply:\n\n${replyText}`;
+    const raw = await callClaude(system, prompt);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch {
+      parsed = { interest: 'pending', brief: 'Pending — could not parse reply.', replySummary: replyText.substring(0, 80) };
+    }
+
+    // Update the project
+    const p = projects[replyTargetProject];
+    if (p) {
+      p.emailReplied = true;
+      p.interest = parsed.interest || 'pending';
+      p.brief = parsed.brief || 'Pending — no details provided.';
+      // Update todo: mark "waiting for reply" as done
+      p.todos = p.todos.map(t => t.text.toLowerCase().includes('waiting') || t.text.toLowerCase().includes('wait') ? {...t, done: true} : t);
+      p.todos.push({ text: `Reply received: ${parsed.replySummary}`, done: true });
+    }
+
+    // Update sent log entry
+    const logEntry = sentLog.find(e => e.project === replyTargetProject);
+    if (logEntry) logEntry.replied = true;
+
+    document.getElementById('reply-modal').classList.remove('open');
+    renderSentLog();
+    renderSidebar();
+    if (activeProject === replyTargetProject) loadProject();
+    if (currentTab === 'analytics') renderAnalytics();
+    if (currentTab === 'summaries') renderSummaries();
+    saveState();
+    alert(`✓ "${replyTargetProject}" updated:\nInterest: ${parsed.interest}\nBrief: ${parsed.brief}`);
+
+  } catch(e) {
+    alert('Failed to analyse reply: ' + e.message);
+  } finally {
+    btn.textContent = 'Analyse & Update';
+    btn.disabled = false;
+  }
+}
+
+function setOutreachState(state) {
+  ['idle','sending','done','error'].forEach(s => {
+    document.getElementById('outreach-' + s).hidden = (s !== state);
+  });
+}
+
+function setStatusMsg(msg) {
+  document.getElementById('outreach-status-msg').textContent = msg;
+}
+
+function renderSentLog() {
+  const log = document.getElementById('outreach-sent-log');
+  if (!log) return;
+  log.innerHTML = '';
+  if (!sentLog.length) {
+    log.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-family:\'DM Mono\',monospace;text-align:center;padding-top:12px;">No emails sent yet.</div>';
+    return;
+  }
+  sentLog.forEach(entry => {
+    const el = document.createElement('div');
+    el.className = 'sent-log-item';
+    el.style.borderLeftColor = entry.replied ? 'var(--green)' : 'var(--pending)';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+        <div class="log-email">${entry.email}</div>
+        <div style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;
+          background:${entry.replied ? 'rgba(62,207,106,0.12)' : 'rgba(196,160,53,0.12)'};
+          color:${entry.replied ? 'var(--green)' : 'var(--pending)'};">
+          ${entry.replied ? 'Replied' : 'Pending'}
+        </div>
+      </div>
+      <div class="log-meta">${entry.subject} · ${entry.date}</div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <span class="log-view-btn" onclick="goToProject('${entry.project}')">View overview →</span>
+        ${!entry.replied ? `<span class="log-view-btn" style="color:var(--accent);" onclick="prefillReply('${entry.project}')">+ Log reply</span>` : ''}
+      </div>
+    `;
+    log.appendChild(el);
+  });
+}
+
+function prefillReply(projectName) {
+  // Select the project in the inline reply dropdown and focus the textarea
+  const sel = document.getElementById('reply-project-select');
+  if (sel) sel.value = projectName;
+  const ta = document.getElementById('reply-textarea-inline');
+  if (ta) {
+    ta.focus();
+    ta.placeholder = `Paste ${projectName}'s reply here...`;
+  }
+}
+
+// ── SUMMARIES ──
+function renderSummaries() {
+  const grid = document.getElementById('summaries-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  Object.entries(projects).forEach(([key, p]) => {
+    const done = p.todos.filter(t => t.done).length;
+    const total = p.todos.length;
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    const meetings = (p.meetings || []);
+    const nextMeeting = meetings.sort((a,b) => a.date.localeCompare(b.date)).find(m => m.date >= new Date().toISOString().split('T')[0]);
+
+    const interestColors = { interested: 'var(--green)', pending: 'var(--pending)', 'not-interested': 'var(--red)' };
+    const interestLabels = { interested: 'Interested', pending: 'Pending', 'not-interested': 'Not Interested' };
+    const iColor = interestColors[p.interest] || 'var(--pending)';
+    const iLabel = interestLabels[p.interest] || 'Pending';
+
+    const replyColor = p.emailReplied ? 'var(--green)' : 'var(--red)';
+    const replyLabel = p.emailReplied ? 'Replied' : 'No Reply';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = `border-left:3px solid ${p.color};cursor:pointer;transition:transform 0.15s;`;
+    card.onmouseenter = () => card.style.transform = 'translateY(-2px)';
+    card.onmouseleave = () => card.style.transform = '';
+    card.onclick = () => goToProject(key);
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:${p.color};flex-shrink:0;"></div>
+          <div style="font-size:16px;font-weight:800;">${key}</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <span style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;background:rgba(0,0,0,0.2);color:${replyColor};border:1px solid ${replyColor}33;">${replyLabel}</span>
+          <span style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;background:rgba(0,0,0,0.2);color:${iColor};border:1px solid ${iColor}33;">${iLabel}</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;">Brief</div>
+      <div style="font-size:12px;color:var(--text-dim);font-family:'DM Mono',monospace;line-height:1.5;margin-bottom:14px;background:var(--surface2);border-radius:6px;padding:8px 10px;">${p.brief}</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;">Progress</div>
+          <div style="font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--accent);">${pct}%</div>
+          <div style="height:4px;background:var(--surface2);border-radius:2px;margin-top:4px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;">${done}/${total} tasks</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;">Next Meeting</div>
+          ${nextMeeting
+            ? `<div style="font-size:12px;font-family:'DM Mono',monospace;color:var(--blue);">${nextMeeting.date}</div>
+               <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${nextMeeting.notes || nextMeeting.project}</div>`
+            : `<div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;">None scheduled</div>`
+          }
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;">Client Paid</div>
+          <div style="font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--green);">${getProjectPaymentLabel(key)}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;">Linked to finance + analytics</div>
+        </div>
+      </div>
+
+      ${p.todos.length ? `
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">To-Do</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${p.todos.slice(0,3).map(t => `
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:12px;height:12px;border-radius:3px;flex-shrink:0;border:1.5px solid ${t.done ? 'var(--green)' : 'var(--border)'};background:${t.done ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;font-size:8px;color:#000;">${t.done ? '✓' : ''}</div>
+              <span style="font-size:12px;color:${t.done ? 'var(--text-muted)' : 'var(--text-dim)'};text-decoration:${t.done ? 'line-through' : 'none'};">${t.text}</span>
+            </div>
+          `).join('')}
+          ${p.todos.length > 3 ? `<div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:2px;">+${p.todos.length - 3} more</div>` : ''}
+        </div>
+      ` : '<div style="font-size:12px;color:var(--text-muted);font-family:\'DM Mono\',monospace;">No tasks yet.</div>'}
+
+      <div style="margin-top:12px;font-size:11px;color:var(--text-muted);text-align:right;font-family:'DM Mono',monospace;">Click to open project →</div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+// ── FINANCE ──
+function fmt(n) { return `R${Number(n).toLocaleString('en-ZA', {minimumFractionDigits:2,maximumFractionDigits:2})}`; }
+function fmtShort(n) { return n >= 1000 ? `R${(n/1000).toFixed(1)}k` : `R${n}`; }
+const GENERAL_BUSINESS_LABEL = 'General Business';
+
+function getBizTypeForProject(projectName) {
+  const project = projects[projectName];
+  if (project?.bizType && String(project.bizType).trim()) return String(project.bizType).trim();
+  return 'Unknown';
+}
+
+function getAnalyticsData() {
+  const allTxns = (financeData.transactions || []).filter(Boolean);
+  const expenseTxns = allTxns.filter(t => t.type === 'expense');
+  const generalIncomeTxns = allTxns.filter(t => t.type === 'income' && !t.project);
+  const generalExpenseTxns = allTxns.filter(t => t.type === 'expense' && !t.project);
+  const relevantLogs = (sentLog || []).filter(e => e && e.project);
+  const byType = {};
+
+  const ensure = (type) => {
+    const key = type && String(type).trim() ? String(type).trim() : 'Unknown';
+    if (!byType[key]) byType[key] = { type: key, sent: 0, replies: 0, interested: 0, pending: 0, notInterested: 0, revenue: 0, expenses: 0, projects: new Set() };
+    return byType[key];
+  };
+
+  relevantLogs.forEach(entry => {
+    const type = getBizTypeForProject(entry.project);
+    const bucket = ensure(type);
+    bucket.sent += 1;
+    if (entry.replied) bucket.replies += 1;
+    if (entry.project) bucket.projects.add(entry.project);
+  });
+
+  Object.entries(projects).forEach(([name, project]) => {
+    const type = getBizTypeForProject(name);
+    const bucket = ensure(type);
+    bucket.projects.add(name);
+    bucket.revenue += getProjectPayment(name);
+    if (project.interest === 'interested') bucket.interested += 1;
+    else if (project.interest === 'not-interested') bucket.notInterested += 1;
+    else bucket.pending += 1;
+  });
+
+  expenseTxns.forEach(txn => {
+    const type = txn.project ? getBizTypeForProject(txn.project) : GENERAL_BUSINESS_LABEL;
+    const bucket = ensure(type);
+    bucket.expenses += Number(txn.amount) || 0;
+    if (txn.project) bucket.projects.add(txn.project);
+  });
+
+  generalIncomeTxns.forEach(txn => {
+    const bucket = ensure(GENERAL_BUSINESS_LABEL);
+    bucket.revenue += Number(txn.amount) || 0;
+  });
+
+  const rows = Object.values(byType).map(row => ({
+    ...row,
+    projectCount: row.projects.size,
+    replyRate: row.sent ? (row.replies / row.sent) : 0,
+    interestRate: row.replies ? (row.interested / row.replies) : 0,
+    profit: row.revenue - row.expenses
+  })).sort((a,b) => (b.revenue - a.revenue) || (b.replies - a.replies) || (b.replyRate - a.replyRate));
+
+  const totalOutreach = relevantLogs.length;
+  const totalReplies = relevantLogs.filter(e => e.replied).length;
+  const totalRevenue = Object.keys(projects).reduce((s,name)=>s+getProjectPayment(name),0) + generalIncomeTxns.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const totalExpenses = expenseTxns.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const totalProfit = totalRevenue - totalExpenses;
+  const totalInterested = Object.values(projects).filter(p => p.interest === 'interested').length;
+  const totalTrackedSeconds = Object.values(projects).reduce((s,p)=>s+(Number(p.timeSpentSeconds) || 0),0);
+  const totalTrackedMinutes = totalTrackedSeconds / 60;
+  const hasTrackedTime = totalTrackedSeconds > 0;
+
+  return {
+    rows,
+    totalOutreach,
+    totalReplies,
+    totalRevenue,
+    totalExpenses,
+    totalProfit,
+    totalInterested,
+    totalTrackedSeconds,
+    totalTrackedMinutes,
+    hasTrackedTime,
+    moneyPerMinute: totalTrackedMinutes > 0 ? (totalRevenue / totalTrackedMinutes) : 0,
+    overallReplyRate: totalOutreach ? (totalReplies / totalOutreach) : 0,
+    revenuePerReply: totalReplies ? (totalRevenue / totalReplies) : 0
+  };
+}
+
+function renderMetricBar(containerId, rows, valueKey, formatter, colorVar, emptyLabel) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  if (!rows.length) {
+    el.innerHTML = `<div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:center;padding-top:18px;">${emptyLabel}</div>`;
+    return;
+  }
+  const max = Math.max(...rows.map(r => Number(r[valueKey]) || 0), 1);
+  rows.forEach(r => {
+    const value = Number(r[valueKey]) || 0;
+    const pct = Math.max(6, Math.round((value / max) * 100));
+    el.innerHTML += `<div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:10px;">
+        <div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.type}</div>
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-dim);flex-shrink:0;">${formatter(r)}</div>
+      </div>
+      <div style="height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${colorVar};border-radius:999px;"></div>
+      </div>
+    </div>`;
+  });
+}
+
+function saveAnnualGoalSettings() {
+  const typeEl = document.getElementById('analytics-annual-goal-type');
+  const targetEl = document.getElementById('analytics-annual-goal-target');
+  if (!typeEl || !targetEl) return;
+  financeData.annualGoal = {
+    type: typeEl.value === 'profit' ? 'profit' : 'revenue',
+    target: Math.max(0, Number(targetEl.value) || 0)
+  };
+  saveState();
+  renderAnalytics();
+}
+
+function renderAnalytics() {
+  const data = getAnalyticsData();
+  const fmtPct = (n) => `${Math.round(n * 100)}%`;
+
+  const empty = data.totalOutreach === 0 && data.totalRevenue === 0 && data.rows.length <= 1 && data.rows[0]?.type === 'Unknown';
+  const emptyState = document.getElementById('analytics-empty-state');
+  const content = document.getElementById('analytics-content');
+  if (emptyState && content) {
+    emptyState.style.display = empty ? 'block' : 'none';
+    content.style.display = empty ? 'none' : 'flex';
+  }
+  if (empty) return;
+
+  const revenueLeader = [...data.rows].sort((a,b) => b.revenue - a.revenue)[0];
+  const repliesLeader = [...data.rows].sort((a,b) => b.replies - a.replies)[0];
+  const bestRate = data.rows.filter(r => r.sent > 0).sort((a,b) => b.replyRate - a.replyRate || b.replies - a.replies)[0];
+  const interestLeader = [...data.rows].sort((a,b) => b.interested - a.interested || b.replyRate - a.replyRate)[0];
+
+  document.getElementById('analytics-top-revenue').textContent = revenueLeader ? revenueLeader.type : '—';
+  document.getElementById('analytics-top-revenue-sub').textContent = revenueLeader ? `${fmt(revenueLeader.revenue)} from ${revenueLeader.projectCount} project${revenueLeader.projectCount === 1 ? '' : 's'}` : 'No revenue tracked yet';
+
+  document.getElementById('analytics-top-replies').textContent = repliesLeader ? repliesLeader.type : '—';
+  document.getElementById('analytics-top-replies-sub').textContent = repliesLeader ? `${repliesLeader.replies} repl${repliesLeader.replies === 1 ? 'y' : 'ies'} from ${repliesLeader.sent} outreach` : 'No replies logged yet';
+
+  document.getElementById('analytics-best-rate').textContent = bestRate ? bestRate.type : '—';
+  document.getElementById('analytics-best-rate-sub').textContent = bestRate ? `${fmtPct(bestRate.replyRate)} reply rate (${bestRate.replies}/${bestRate.sent})` : 'Need sent outreach first';
+
+  document.getElementById('analytics-top-interest').textContent = interestLeader ? interestLeader.type : '—';
+  document.getElementById('analytics-top-interest-sub').textContent = interestLeader ? `${interestLeader.interested} interested lead${interestLeader.interested === 1 ? '' : 's'}` : 'No interested leads yet';
+
+  document.getElementById('analytics-total-outreach').textContent = String(data.totalOutreach);
+  document.getElementById('analytics-overall-reply-rate').textContent = fmtPct(data.overallReplyRate);
+  document.getElementById('analytics-overall-reply-rate-sub').textContent = `${data.totalReplies} of ${data.totalOutreach} replied`;
+  document.getElementById('analytics-revenue-per-reply').textContent = fmt(data.revenuePerReply);
+  document.getElementById('analytics-revenue-per-reply-sub').textContent = data.totalReplies ? `${fmt(data.totalRevenue)} total income across ${data.totalReplies} repl${data.totalReplies === 1 ? 'y' : 'ies'}` : 'Log replies to make this less hand-wavy';
+  const minutesLabel = data.totalTrackedMinutes > 0
+    ? `${data.totalTrackedMinutes.toFixed(1)} total minute${data.totalTrackedMinutes.toFixed(1) === '1.0' ? '' : 's'}`
+    : '0.0 total minutes';
+  document.getElementById('analytics-money-per-minute').textContent = `${fmt(data.moneyPerMinute)}/min`;
+  document.getElementById('analytics-money-per-minute-sub').textContent =
+    `${fmt(data.totalRevenue)} ÷ ${minutesLabel}`;
+
+  const annualGoal = financeData.annualGoal || { type: 'revenue', target: 0 };
+  const goalType = annualGoal.type === 'profit' ? 'profit' : 'revenue';
+  const goalTarget = Math.max(0, Number(annualGoal.target) || 0);
+  const currentAmount = goalType === 'profit' ? data.totalProfit : data.totalRevenue;
+  const progress = goalTarget > 0 ? Math.min((currentAmount / goalTarget) * 100, 100) : 0;
+  const remaining = Math.max(0, goalTarget - currentAmount);
+  const yearLabel = new Date().getFullYear();
+
+  const goalTypeEl = document.getElementById('analytics-annual-goal-type');
+  const goalTargetEl = document.getElementById('analytics-annual-goal-target');
+  if (goalTypeEl) goalTypeEl.value = goalType;
+  if (goalTargetEl && document.activeElement !== goalTargetEl) goalTargetEl.value = goalTarget ? String(goalTarget) : '';
+
+  document.getElementById('analytics-annual-goal-sub').textContent = `Track your ${goalType} goal for ${yearLabel}.`;
+  document.getElementById('analytics-annual-goal-current').textContent = fmt(currentAmount);
+  document.getElementById('analytics-annual-goal-target-display').textContent = fmt(goalTarget);
+  document.getElementById('analytics-annual-goal-progress-label').textContent =
+    goalTarget > 0
+      ? `${Math.round(progress)}% complete`
+      : '0% complete';
+  document.getElementById('analytics-annual-goal-bar').style.width = `${progress}%`;
+  const annualGoalSubBottom = document.getElementById('analytics-annual-goal-sub-bottom');
+  if (annualGoalSubBottom) {
+    annualGoalSubBottom.textContent = goalTarget > 0
+      ? `${fmt(remaining)} remaining`
+      : 'Set a target to start tracking progress';
+  }
+
+  const tbody = document.getElementById('analytics-type-tbody');
+  tbody.innerHTML = '';
+  data.rows.forEach(row => {
+    tbody.innerHTML += `<tr>
+      <td><span style="font-weight:700;">${row.type}</span></td>
+      <td>${row.sent}</td>
+      <td>${row.replies}</td>
+      <td><span style="font-family:'DM Mono',monospace;color:${row.replyRate >= 0.5 ? 'var(--green)' : row.replyRate > 0 ? 'var(--accent)' : 'var(--text-muted)'};font-weight:700;">${fmtPct(row.replyRate)}</span></td>
+      <td>${row.interested}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:700;">${fmt(row.revenue)}</td>
+    </tr>`;
+  });
+
+  renderMetricBar('analytics-revenue-bars', [...data.rows].sort((a,b) => b.revenue - a.revenue).slice(0, 6), 'revenue', r => fmt(r.revenue), 'linear-gradient(90deg,var(--blue),var(--accent))', 'No revenue by type yet.');
+  renderMetricBar('analytics-response-bars', data.rows.filter(r => r.sent > 0).sort((a,b) => b.replyRate - a.replyRate || b.replies - a.replies).slice(0, 6), 'replyRate', r => `${fmtPct(r.replyRate)} · ${r.replies}/${r.sent}`, 'linear-gradient(90deg,var(--green),var(--accent))', 'No outreach reply data yet.');
+}
+
+function getRevenueBreakdownForGoals() {
+  const allIncome = getDisplayTransactions().filter(t => t && t.type === 'income');
+  const oneTimeRevenue = allIncome
+    .filter(t => (t.paymentType || 'one-time') !== 'monthly')
+    .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+  const monthlyRevenue = allIncome
+    .filter(t => (t.paymentType || 'one-time') === 'monthly')
+    .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+  return {
+    oneTimeRevenue,
+    monthlyRevenue,
+    totalRevenue: oneTimeRevenue + monthlyRevenue
+  };
+}
+
+function renderFinance() {
+  const inv = financeData.invoices;
+  const txns = getDisplayTransactions();
+  const goals = financeData.goals || [];
+
+  const totalIncome = txns.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+  const totalExpense = txns.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+  const totalOutstanding = inv.filter(i=>i.status==='pending'||i.status==='overdue').reduce((s,i)=>s+Number(i.amount),0);
+  const balance = totalIncome - totalExpense;
+
+  // ── STAT CARDS ──
+  document.getElementById('fin-balance').textContent = fmt(balance);
+  document.getElementById('fin-balance').style.color = balance >= 0 ? 'var(--text)' : 'var(--red)';
+  document.getElementById('fin-balance-sub').innerHTML = `<span style="color:${balance>=0?'var(--green)':'var(--red)'};">${balance>=0?'↑':'↓'} ${txns.length} transactions</span>`;
+  document.getElementById('fin-income').textContent = fmt(totalIncome);
+  const recurringCount = Object.keys(projects).filter(name => getProjectPaymentMode(name) === 'monthly' && getProjectPayment(name) > 0).length;
+  const projectIncomeCount = Object.keys(projects).filter(name => getProjectPayment(name) > 0).length;
+  const generalIncomeCount = txns.filter(t => t.type === 'income' && !t.project).length;
+  document.getElementById('fin-income-sub').textContent = `${projectIncomeCount} project payment${projectIncomeCount === 1 ? '' : 's'}${generalIncomeCount ? ` · ${generalIncomeCount} general income item${generalIncomeCount === 1 ? '' : 's'}` : ''}${recurringCount ? ` · ${recurringCount} monthly` : ''}`;
+  document.getElementById('fin-expense').textContent = fmt(totalExpense);
+  const generalExpenseCount = txns.filter(t=>t.type==='expense' && !t.project).length;
+  document.getElementById('fin-expense-sub').textContent = `${txns.filter(t=>t.type==='expense').length} expenses logged${generalExpenseCount ? ` · ${generalExpenseCount} general` : ''}`;
+  document.getElementById('fin-outstanding').textContent = fmt(totalOutstanding);
+  document.getElementById('fin-outstanding-sub').textContent = `${inv.filter(i=>i.status!=='paid').length} unpaid invoices`;
+
+  drawMoneyFlowChart(txns);
+  drawBudgetDonut(txns);
+
+  // ── INVOICES ──
+  const invTbody = document.getElementById('invoice-tbody');
+  invTbody.innerHTML = '';
+  if (!inv.length) {
+    invTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">No invoices yet.</td></tr>';
+  } else {
+    inv.forEach(i => {
+      const badge = i.status==='paid'?'<span class="badge-paid">Paid</span>':i.status==='overdue'?'<span class="badge-overdue">Overdue</span>':'<span class="badge-pending">Pending</span>';
+      const freqBadge = i.paymentType === 'monthly'
+        ? '<span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(91,142,240,0.35);background:rgba(91,142,240,0.08);color:var(--blue);font-weight:700;font-family:\'DM Mono\',monospace;">Monthly</span>'
+        : '<span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-weight:700;font-family:\'DM Mono\',monospace;">One-time</span>';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight:600;">${i.project || GENERAL_BUSINESS_LABEL}</td>
+        <td style="color:var(--text-dim);font-size:12px;">${i.desc}</td>
+        <td style="font-family:'DM Mono',monospace;font-weight:700;color:var(--accent);">${fmt(i.amount)}${i.paymentType === 'monthly' ? '/mo' : ''}</td>
+        <td>${freqBadge}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${i.date}</td>
+        <td>${badge}</td>
+        <td style="display:flex;gap:4px;align-items:center;">
+          <button onclick="cycleInvoiceStatus(${i.id})" style="background:none;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:10px;padding:2px 6px;border-radius:4px;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">↻</button>
+          <button onclick="deleteInvoice(${i.id})" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:0.6;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">×</button>
+        </td>`;
+      invTbody.appendChild(tr);
+    });
+  }
+
+  // ── PROFIT PER PROJECT ──
+  const profitDiv = document.getElementById('profit-bars');
+  profitDiv.innerHTML = '';
+  const projectKeys = [...new Set([...Object.keys(projects).filter(k => getProjectPayment(k) > 0), ...txns.map(t=>t.project).filter(Boolean)])];
+  const hasGeneralFinance = txns.some(t => !t.project);
+  if (!projectKeys.length && !hasGeneralFinance) {
+    profitDiv.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-family:\'DM Mono\',monospace;text-align:center;padding-top:16px;line-height:1.6;">Add income or expenses<br>linked to projects.</div>';
+  } else {
+    const profits = [
+      ...projectKeys.map(k=>({k,income:getProjectPayment(k),expense:txns.filter(t=>t.project===k&&t.type==='expense').reduce((s,t)=>s+Number(t.amount),0), general:false})),
+      ...(hasGeneralFinance ? [{k:GENERAL_BUSINESS_LABEL,income:txns.filter(t=>t.type==='income'&&!t.project).reduce((s,t)=>s+Number(t.amount),0),expense:txns.filter(t=>t.type==='expense'&&!t.project).reduce((s,t)=>s+Number(t.amount),0), general:true}] : [])
+    ].sort((a,b)=>(b.income-b.expense)-(a.income-a.expense));
+    const maxAbs = Math.max(...profits.map(p=>Math.abs(p.income-p.expense)),1);
+    profits.forEach(({k,income,expense,general})=>{
+      const profit=income-expense, pct=Math.round((Math.abs(profit)/maxAbs)*100), col=profit>=0?'var(--green)':'var(--red)', p=projects[k];
+      profitDiv.innerHTML+=`<div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:6px;">${general?`<div style="width:7px;height:7px;border-radius:50%;background:var(--accent);"></div>`:(p?`<div style="width:7px;height:7px;border-radius:50%;background:${p.color};"></div>`:'')}<span style="font-size:12px;font-weight:700;">${k}</span></div>
+          <span style="font-size:13px;font-family:'DM Mono',monospace;color:${col};font-weight:800;">${profit>=0?'+':''}${fmt(profit)}</span>
+        </div>
+        <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;border:1px solid var(--border);"><div style="height:100%;width:${pct}%;background:${col};border-radius:3px;opacity:0.85;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px;">
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">In: ${fmt(income)}</span>
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Out: ${fmt(expense)}</span>
+        </div></div>`;
+    });
+  }
+
+  // ── SAVING GOALS ──
+  const goalsDiv = document.getElementById('saving-goals');
+  const revenueBreakdown = getRevenueBreakdownForGoals();
+  goalsDiv.innerHTML = '';
+  if (!goals.length) {
+    goalsDiv.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-family:\'DM Mono\',monospace;text-align:center;padding-top:16px;line-height:1.6;">No goals yet.<br>Click + Goal to add one.</div>';
+  } else {
+    goals.forEach((g,i)=>{
+      const revenuePct = Math.max(0, Number(g.revenuePct) || 0);
+      const autoSavedOneTime = revenueBreakdown.oneTimeRevenue * (revenuePct / 100);
+      const autoSavedMonthly = revenueBreakdown.monthlyRevenue * (revenuePct / 100);
+      const autoSaved = autoSavedOneTime + autoSavedMonthly;
+      const currentSaved = (Number(g.saved) || 0) + autoSaved;
+      const pct=Math.min(Math.round((currentSaved/g.target)*100),100), col=pct>=100?'var(--green)':pct>=60?'var(--accent)':'var(--blue)';
+      goalsDiv.innerHTML+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:700;">${g.name}</div>
+          <button onclick="deleteGoal(${i})" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;opacity:0.6;line-height:1;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">×</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:12px;font-family:'DM Mono',monospace;color:${col};font-weight:700;">${fmt(currentSaved)}</span>
+          <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text-muted);">of ${fmt(g.target)}</span>
+        </div>
+        <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden;border:1px solid var(--border);"><div style="height:100%;width:${pct}%;background:${col};border-radius:3px;"></div></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Manual: ${fmt(Number(g.saved)||0)}</span>
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Auto total: ${fmt(autoSaved)} (${revenuePct}% of revenue)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:4px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">One-time share: ${fmt(autoSavedOneTime)}</span>
+          <span style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Monthly share: ${fmt(autoSavedMonthly)}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-family:'DM Mono',monospace;text-align:right;">${pct}% saved</div>
+      </div>`;
+    });
+  }
+}
+
+function drawMoneyFlowChart(txns) {
+  const canvas = document.getElementById('money-flow-canvas');
+  if (!canvas) return;
+  const container = document.getElementById('money-flow-chart');
+  canvas.width = container.offsetWidth || 400;
+  canvas.height = 140;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const now = new Date();
+  const last6 = Array.from({length:6}, (_,i) => (now.getMonth() - 5 + i + 12) % 12);
+
+  const incomeByMonth = last6.map(m => txns.filter(t=>t.type==='income'&&t.date&&new Date(t.date).getMonth()===m).reduce((s,t)=>s+Number(t.amount),0));
+  const expByMonth = last6.map(m => txns.filter(t=>t.type==='expense'&&t.date&&new Date(t.date).getMonth()===m).reduce((s,t)=>s+Number(t.amount),0));
+  const maxVal = Math.max(...incomeByMonth, ...expByMonth, 1);
+
+  const padL=10, padR=10, padT=10, padB=20;
+  const w = canvas.width - padL - padR;
+  const h = canvas.height - padT - padB;
+  const barW = (w / last6.length) * 0.35;
+  const gap = barW * 0.3;
+
+  last6.forEach((m, i) => {
+    const x = padL + (w / last6.length) * i + (w / last6.length) * 0.15;
+    const incH = (incomeByMonth[i] / maxVal) * h;
+    const expH = (expByMonth[i] / maxVal) * h;
+
+    // Income bar
+    ctx.fillStyle = 'rgba(62,207,106,0.7)';
+    ctx.beginPath();
+    ctx.roundRect(x, padT + h - incH, barW, incH, [3,3,0,0]);
+    ctx.fill();
+
+    // Expense bar
+    ctx.fillStyle = 'rgba(232,84,84,0.7)';
+    ctx.beginPath();
+    ctx.roundRect(x + barW + gap, padT + h - expH, barW, expH, [3,3,0,0]);
+    ctx.fill();
+  });
+
+  // Labels
+  const labelsDiv = document.getElementById('money-flow-labels');
+  if (labelsDiv) labelsDiv.innerHTML = last6.map(m => `<span>${months[m]}</span>`).join('');
+}
+
+function drawBudgetDonut(txns) {
+  const canvas = document.getElementById('budget-donut-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,90,90);
+
+  const categories = {};
+  txns.filter(t=>t.type==='expense').forEach(t => {
+    const cat = t.category || 'General';
+    categories[cat] = (categories[cat]||0) + Number(t.amount);
+  });
+
+  const entries = Object.entries(categories);
+  const total = entries.reduce((s,[,v])=>s+v,0);
+  document.getElementById('budget-total-label').textContent = fmtShort(total);
+
+  const colors = ['var(--accent)','var(--blue)','var(--green)','#b06ef0','var(--red)','#70f0c0'];
+
+  if (!entries.length) {
+    ctx.strokeStyle = 'var(--border)';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(45,45,35,0,Math.PI*2);
+    ctx.stroke();
+  } else {
+    let startAngle = -Math.PI/2;
+    const computedColors = colors.map(c => {
+      const tmp = document.createElement('div');
+      tmp.style.color = c; document.body.appendChild(tmp);
+      const computed = getComputedStyle(tmp).color; document.body.removeChild(tmp);
+      return computed;
+    });
+    entries.forEach(([,v],i) => {
+      const slice = (v/total) * Math.PI*2;
+      ctx.strokeStyle = computedColors[i % computedColors.length];
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.arc(45,45,33,startAngle,startAngle+slice);
+      ctx.stroke();
+      startAngle += slice + 0.03;
+    });
+  }
+
+  // Legend
+  const legend = document.getElementById('budget-legend');
+  if (legend) {
+    legend.innerHTML = entries.slice(0,5).map(([cat,v],i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <div style="display:flex;align-items:center;gap:5px;">
+          <div style="width:7px;height:7px;border-radius:50%;background:${colors[i%colors.length]};flex-shrink:0;"></div>
+          <span style="color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;">${cat}</span>
+        </div>
+        <span style="color:var(--text);font-weight:600;">${fmtShort(v)}</span>
+      </div>`).join('');
+  }
+}
+
+// ── TRANSACTION CRUD ──
+function openAddTransactionModal(type) {
+  document.getElementById('txn-type').value = type;
+  document.getElementById('txn-modal-title').textContent = type === 'income' ? 'Set Client Payment' : 'Add Expense';
+  const projectOptions = [`<option value="__general__">${GENERAL_BUSINESS_LABEL} (not tied to a project)</option>`, ...Object.keys(projects).map(k=>`<option value="${k}">${k}</option>`)];
+  document.getElementById('txn-project').innerHTML = projectOptions.join('');
+  document.getElementById('txn-project').value = type === 'expense' && activeProject && projects[activeProject] ? activeProject : '__general__';
+  document.getElementById('txn-desc').value = '';
+  document.getElementById('txn-amount').value = '';
+  document.getElementById('txn-category').value = '';
+  document.getElementById('txn-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('txn-payment-type').value = 'one-time';
+  const typeLabel = document.querySelector('#txn-payment-type-wrap .form-label');
+  if (typeLabel) typeLabel.textContent = type === 'income' ? 'Payment Type' : 'Expense Type';
+  document.getElementById('txn-payment-type-wrap').style.display = 'block';
+  document.getElementById('add-transaction-modal').classList.add('open');
+}
+
+function saveTransaction() {
+  const type = document.getElementById('txn-type').value;
+  const projectValue = document.getElementById('txn-project').value;
+  const project = projectValue === '__general__' ? null : projectValue;
+  const desc = document.getElementById('txn-desc').value.trim();
+  const amount = parseFloat(document.getElementById('txn-amount').value);
+  const category = document.getElementById('txn-category').value.trim() || 'General';
+  const date = document.getElementById('txn-date').value;
+  const paymentType = document.getElementById('txn-payment-type')?.value === 'monthly' ? 'monthly' : 'one-time';
+  if (!amount) { alert('Please enter an amount.'); return; }
+
+  if (!financeData.transactions) financeData.transactions = [];
+
+  if (type === 'income') {
+    financeData.transactions.unshift({
+      id: financeData.nextId++,
+      type,
+      project: project || null,
+      desc: desc || (project ? 'Client payment' : 'General business income'),
+      amount,
+      category: category || (project ? 'Project Payment' : 'General'),
+      date,
+      paymentType,
+      general: !project
+    });
+
+    if (project && projects[project]) {
+      projects[project].paymentMode = paymentType;
+      projects[project].paymentDate = date || new Date().toISOString().split('T')[0];
+      if (project === activeProject) {
+        const paymentInput = document.getElementById('meta-client-payment');
+        const paymentTypeInput = document.getElementById('meta-payment-type');
+        if (paymentInput) paymentInput.value = getProjectPayment(project);
+        if (paymentTypeInput) paymentTypeInput.value = paymentType;
+      }
+    }
+  } else {
+    if (!desc) { alert('Please fill in description and amount.'); return; }
+    financeData.transactions.unshift({ id: financeData.nextId++, type, project: project || null, desc, amount, category, date, paymentType, general: !project });
+  }
+
+  document.getElementById('add-transaction-modal').classList.remove('open');
+  renderFinance();
+  renderAnalytics();
+  renderSummaries();
+  saveState();
+}
+
+function deleteTransaction(id) {
+  financeData.transactions = (financeData.transactions||[]).filter(t=>t.id!==id);
+  renderFinance();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+// ── GOAL CRUD ──
+function openAddGoalModal() {
+  document.getElementById('goal-name').value = '';
+  document.getElementById('goal-target').value = '';
+  document.getElementById('goal-saved').value = '';
+  document.getElementById('goal-revenue-pct').value = '';
+  document.getElementById('add-goal-modal').classList.add('open');
+}
+
+function saveGoal() {
+  const name = document.getElementById('goal-name').value.trim();
+  const target = parseFloat(document.getElementById('goal-target').value);
+  const saved = parseFloat(document.getElementById('goal-saved').value) || 0;
+  const revenuePct = Math.max(0, Math.min(100, parseFloat(document.getElementById('goal-revenue-pct').value) || 0));
+  if (!name || !target) { alert('Please fill in name and target.'); return; }
+  if (!financeData.goals) financeData.goals = [];
+  financeData.goals.push({ name, target, saved, revenuePct });
+  document.getElementById('add-goal-modal').classList.remove('open');
+  renderFinance();
+  saveState();
+}
+
+function deleteGoal(i) {
+  financeData.goals.splice(i, 1);
+  renderFinance();
+  saveState();
+}
+
+function cycleInvoiceStatus(id) {
+  const inv = financeData.invoices.find(i => i.id === id);
+  if (!inv) return;
+  const cycle = { pending: 'paid', paid: 'overdue', overdue: 'pending' };
+  inv.status = cycle[inv.status] || 'pending';
+  renderFinance();
+  saveState();
+}
+
+function deleteInvoice(id) {
+  financeData.invoices = financeData.invoices.filter(i => i.id !== id);
+  renderFinance();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+function openAddInvoiceModal() {
+  const sel = document.getElementById('inv-project');
+  const options = [`<option value="__general__">${GENERAL_BUSINESS_LABEL} (not tied to a project)</option>`, ...Object.keys(projects).map(k => `<option value="${k}">${k}</option>` )];
+  sel.innerHTML = options.join('');
+  sel.value = activeProject && projects[activeProject] ? activeProject : '__general__';
+  document.getElementById('inv-amount').value = '';
+  document.getElementById('inv-desc').value = '';
+  document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('inv-status').value = 'pending';
+  document.getElementById('inv-payment-type').value = 'one-time';
+  document.getElementById('add-invoice-modal').classList.add('open');
+}
+
+function saveInvoice() {
+  const projectValue = document.getElementById('inv-project').value;
+  const project = projectValue === '__general__' ? null : projectValue;
+  const amount = parseFloat(document.getElementById('inv-amount').value);
+  const desc = document.getElementById('inv-desc').value.trim();
+  const date = document.getElementById('inv-date').value;
+  const status = document.getElementById('inv-status').value;
+  const paymentType = document.getElementById('inv-payment-type').value === 'monthly' ? 'monthly' : 'one-time';
+  if (!amount || !desc || !date) { alert('Please fill in all fields.'); return; }
+  financeData.invoices.unshift({ id: financeData.nextId++, project, desc, amount, date, status, paymentType, general: !project });
+  document.getElementById('add-invoice-modal').classList.remove('open');
+  renderFinance();
+  if (currentTab === 'analytics') renderAnalytics();
+  saveState();
+}
+
+function openAddExpenseModal() { openAddTransactionModal('expense'); }
+function saveExpense() { saveTransaction(); }
+
+// ── INIT ──
+renderSidebar();
+loadProject();
+renderMiniCal();
+renderPitchBlocks();
+renderSentLog();
+renderSummaries();
+renderAnalytics();
+
+// Init API settings button label
+const apiBtn = document.getElementById('api-settings-btn');
+if (apiBtn) apiBtn.textContent = `⚙ ${aiProvider === 'openai' ? 'GPT-5' : 'Claude'}`;
+
+
+// Restore gmail setup if previously saved
+if (gmailUser) {
+  document.getElementById('outreach-setup').style.display = 'none';
+  document.getElementById('outreach-composer').style.display = 'flex';
+  document.getElementById('outreach-from-label').textContent = gmailUser;
+  document.getElementById('gmail-address').value = gmailUser;
+  populateReplyProjectSelect();
+}
+
+// Save on brief edits
+document.getElementById('brief-text')?.addEventListener('input', () => {
+  projects[activeProject].brief = document.getElementById('brief-text').textContent;
+  saveState();
+});
+
+// Auto-refresh when new data comes from contact form
+window.addEventListener('reachr-data-changed', () => {
+    if (document.visibilityState === 'visible') {
+        location.reload();
+    }
+});
+// Also listen for storage events from other tabs
+window.addEventListener('storage', (e) => {
+    if (e.key === 'dealpilot_clean_slate_v1' && document.visibilityState === 'visible') {
+        location.reload();
+    }
+});
+// Fallback refresh every 30 seconds
+setInterval(() => {
+    if (document.visibilityState === 'visible') location.reload();
+}, 30000);
+
+</script>
+
+<!-- REPLY MODAL -->
+<div class="modal-overlay" id="reply-modal">
+  <div class="modal" style="width:500px;max-width:95vw;">
+    <button class="modal-close" onclick="document.getElementById('reply-modal').classList.remove('open')">×</button>
+    <div class="modal-title">Log Client Reply</div>
+    <div style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:14px;">
+      Project: <span id="reply-project-label" style="color:var(--accent);font-weight:600;"></span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Paste the client's reply email</label>
+      <textarea id="reply-textarea" style="width:100%;height:160px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;" placeholder="Paste the full reply here — AI will extract their interest level, what they want, and update the project overview automatically..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="form-btn" id="reply-submit-btn" style="flex:1;" onclick="submitReply()">✦ Analyse &amp; Update Project</button>
+      <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:right;line-height:1.4;">AI will fill:<br>interest · brief · todos</div>
+    </div>
+  </div>
+</div>
+<script>
+// ========== RELIABLE SYNC WITH CUSTOMER SITE ==========
+let refreshTimer = null;
+
+function refreshDashboardFromStorage() {
+    console.log('Dashboard refresh triggered');
+    const newState = loadState();  // your existing loadState()
+    // Merge any new projects from storage into current UI
+    Object.assign(projects, newState.projects);
+    Object.assign(financeData, newState.financeData);
+    sentLog.length = 0;
+    sentLog.push(...(newState.sentLog || []));
+    // Re-render everything
+    renderSidebar();
+    loadProject();
+    if (currentTab === 'finance') renderFinance();
+    if (currentTab === 'analytics') renderAnalytics();
+    if (currentTab === 'summaries') renderSummaries();
+    if (currentTab === 'outreach') renderSentLog();
+    if (currentTab === 'pitches') renderPitchBlocks();
+    // ... any other page renders you need
+}
+
+// Listen for sessionStorage changes (cross-tab)
+window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_KEY) {
+        console.log('Storage changed, refreshing dashboard');
+        refreshDashboardFromStorage();
+    }
+    if (e.key === 'reachr_force_refresh') {
+        console.log('Force refresh signal received');
+        refreshDashboardFromStorage();
+    }
+});
+
+// Listen for custom event (same tab)
+window.addEventListener('reachr-data-updated', () => {
+    console.log('Custom event received');
+    refreshDashboardFromStorage();
+});
+
+
+// Also refresh when tab becomes visible again
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        refreshDashboardFromStorage();
+    }
+});
+
+// Initial load & set up periodic check (every 10 seconds) as fallback
+setInterval(() => {
+    refreshDashboardFromStorage();
+}, 10000);
+
+// Modified saveProjectMeta to handle both fields
+function saveProjectMeta() {
+    const p = projects[activeProject];
+    if (!p) return;
+    p.clientName = document.getElementById('meta-client-name')?.value.trim() || '';
+    p.clientEmail = document.getElementById('meta-client-email')?.value.trim() || '';
+    p.bizType = document.getElementById('meta-biz-type')?.value.trim() || '';
+    p.paymentMode = document.getElementById('meta-payment-type')?.value || 'one-time';
+    
+    if (p.paymentMode === 'mixed') {
+        p.payment = Math.max(0, Number(document.getElementById('meta-client-payment')?.value) || 0);
+        p.monthlyPayment = Math.max(0, Number(document.getElementById('meta-monthly-payment')?.value) || 0);
+    } else if (p.paymentMode === 'monthly') {
+        p.payment = 0;
+        p.monthlyPayment = Math.max(0, Number(document.getElementById('meta-client-payment')?.value) || 0);
+    } else {
+        p.payment = Math.max(0, Number(document.getElementById('meta-client-payment')?.value) || 0);
+        p.monthlyPayment = 0;
+    }
+    
+    p.paymentDate = new Date().toISOString().split('T')[0];
+    renderProjectFinanceOverview();
+    renderSummaries();
+    renderAnalytics();
+    renderFinance();
+    saveState();
+}
+
+// Update loadProject() to fill both fields – find the existing loadProject() and add these lines
+// In loadProject(), after setting meta values, add:
+if (p.paymentMode === 'mixed') {
+    document.getElementById('meta-client-payment').value = p.payment || 0;
+    if (document.getElementById('meta-monthly-payment')) {
+        document.getElementById('meta-monthly-payment').value = p.monthlyPayment || 0;
+    }
+}
+togglePaymentFields();
+
+// Also update getProjectPaymentLabel to show mixed format
+function getProjectPaymentLabel(projectName) {
+    const p = projects[projectName];
+    if (p.paymentMode === 'mixed') {
+        return `${fmt(p.payment || 0)} + ${fmt(p.monthlyPayment || 0)}/mo`;
+    }
+    const amount = getProjectPayment(projectName);
+    return getProjectPaymentMode(projectName) === 'monthly' ? `${fmt(amount)}/mo` : fmt(amount);
+}
+</script>
+</body>
+</html>
